@@ -4,42 +4,7 @@ import { IoArrowBackOutline, IoArrowForwardOutline } from "react-icons/io5";
 import Button from "./Button";
 import { useRef, useState } from "react";
 
-const product: IProduct = {
-	title: "GLORYBOYZ Regular Fit Hawaiian Tropical Printed Kids & Junior Boys Shirt",
-	description: "",
-	featured: true,
-	images: [
-		{
-			_id: "",
-			url: "/shirt.jpeg",
-		},
-	],
-	price: 230,
-	reviews: [],
-	stock: 10,
-	category: {
-		_id: "",
-		name: "Shirts",
-		createdAt: "",
-		updatedAt: "",
-	},
-	color: {
-		_id: "",
-		name: "Shirts",
-		value: "#000000",
-		createdAt: "",
-		updatedAt: "",
-	},
-	size: {
-		_id: "",
-		name: "Medium",
-		value: "M",
-		createdAt: "",
-		updatedAt: "",
-	},
-};
-
-const Carousel = () => {
+const Carousel: React.FC<{ products: IProduct[] }> = ({ products }) => {
 	const [index, setIndex] = useState(0);
 	const sliderRef = useRef<HTMLDivElement>(null);
 
@@ -79,17 +44,9 @@ const Carousel = () => {
 					className="flex items-center gap-5 transition duration-500"
 					ref={sliderRef}
 				>
-					<CarouselItem product={product} isLoading />
-					<CarouselItem product={product} isLoading />
-					<CarouselItem product={product} isLoading />
-					<CarouselItem product={product} isLoading />
-					<CarouselItem product={product} isLoading />
-					<CarouselItem product={product} isLoading />
-					<CarouselItem product={product} isLoading />
-					<CarouselItem product={product} isLoading />
-					<CarouselItem product={product} isLoading />
-					<CarouselItem product={product} isLoading />
-					<CarouselItem product={product} isLoading />
+					{products?.map((product) => (
+						<CarouselItem product={product} key={product._id} />
+					))}
 				</div>
 			</div>
 			<Button

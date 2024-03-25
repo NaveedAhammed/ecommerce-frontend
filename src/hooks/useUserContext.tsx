@@ -3,7 +3,7 @@ import { UserType } from "../types";
 
 interface UserContextStore {
 	user: UserType | null;
-	setUser: (user: UserType) => void;
+	setUser: (user: UserType | null) => void;
 }
 
 const useRegisterModal = create<UserContextStore>((set) => ({

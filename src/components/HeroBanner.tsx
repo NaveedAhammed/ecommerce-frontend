@@ -1,10 +1,14 @@
-const HeroBanner = () => {
+import { IBillboard } from "../types";
+
+const HeroBanner: React.FC<{ heroBanner: IBillboard }> = ({ heroBanner }) => {
+	console.log(heroBanner);
 	return (
-		<div className="py-4 cursor-pointer w-full">
+		<div className="py-4 cursor-pointer w-full h-[24rem]">
+			<h1></h1>
 			<img
-				src="/img8.webp"
-				alt=""
-				className="w-full h-auto rounded-md brightness-90"
+				src={heroBanner?.imageUrl}
+				alt={heroBanner?.title}
+				className="w-full h-full object-cover rounded-md brightness-90"
 			/>
 		</div>
 	);

@@ -24,16 +24,16 @@ const router = createBrowserRouter([
 						element: <Home />,
 					},
 					{
+						path: "/product/:id",
+						element: <Details />,
+					},
+					{
+						path: "/products",
+						element: <Products />,
+					},
+					{
 						element: <ProtectedLayout />,
 						children: [
-							{
-								path: "/product/:id",
-								element: <Details />,
-							},
-							{
-								path: "/products",
-								element: <Products />,
-							},
 							{
 								path: "/wishlist",
 								element: <Wishlist />,

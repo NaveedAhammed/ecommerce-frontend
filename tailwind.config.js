@@ -17,6 +17,8 @@ export default {
 				accent: "hsl(210 40% 96.1%)",
 				accentForeground: "hsl(222.2 47.4% 11.2%)",
 				ring: "hsl(215 20.2% 65.1%)",
+				success: "hsl(120, 100%, 50%)",
+				successForground: "#009A00",
 			},
 		},
 		fontFamily: {

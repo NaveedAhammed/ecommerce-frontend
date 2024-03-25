@@ -29,8 +29,6 @@ const Login = () => {
 
 	const { setUser, user } = useUserContext();
 
-	console.log(user);
-
 	const navigate = useNavigate();
 
 	const handleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -5,19 +5,32 @@ export type UserType = {
 	id: string;
 };
 
+export interface IBillboard {
+	_id: string;
+	title: string;
+	category: IParentCategory;
+	imageUrl: string;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
+}
+
 export interface IProduct {
+	_id: string;
 	title: string;
 	description: string;
 	price: number;
 	stock: number;
-	discount?: number;
+	discount: number;
 	images: IImage[];
 	numRating?: number;
-	category?: ICategory;
+	category: IChildCategory;
 	color?: IColor;
-	size?: ISize;
+	unit?: IUnit;
 	reviews: IReview[];
 	featured: boolean;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface IImage {
@@ -32,7 +45,15 @@ export interface IReview {
 	comment: string;
 }
 
-export interface ICategory {
+export interface IChildCategory {
+	_id: string;
+	name: string;
+	parentCategory: IParentCategory;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface IParentCategory {
 	_id: string;
 	name: string;
 	createdAt: string;
@@ -47,10 +68,11 @@ export interface IColor {
 	updatedAt: string;
 }
 
-export interface ISize {
+export interface IUnit {
 	_id: string;
 	name: string;
 	value: string;
+	shortHand?: string;
 	createdAt: string;
 	updatedAt: string;
 }

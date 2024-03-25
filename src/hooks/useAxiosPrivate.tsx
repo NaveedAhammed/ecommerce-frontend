@@ -34,6 +34,9 @@ const useAxiosPrivate = () => {
 					] = `Bearer ${newAccessToken}`;
 					return privateAxios(prevRequest);
 				}
+				// if (error?.response?.status === 401 && !prevRequest?.sent) {
+				// 	setUser(null);
+				// }
 				return Promise.reject(error);
 			}
 		);

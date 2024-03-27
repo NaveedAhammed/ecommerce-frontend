@@ -4,9 +4,10 @@ import ProtectedLayout from "./ProtectedLayout";
 import PersistLogin from "./components/PersistLogin";
 import { lazy } from "react";
 import Login from "./pages/Login";
-import Details from "./pages/Details";
 
 const Home = lazy(() => import("./pages/Home"));
+const Details = lazy(() => import("./pages/Details"));
+const Profile = lazy(() => import("./pages/Profile"));
 const Products = lazy(() => import("./pages/Products"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
 const Orders = lazy(() => import("./pages/Orders"));
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
 							{
 								path: "/cart",
 								element: <Cart />,
+							},
+							{
+								path: "/myProfile",
+								element: <Profile />,
 							},
 						],
 					},

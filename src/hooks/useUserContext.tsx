@@ -1,14 +1,9 @@
-import { create } from "zustand";
-import { UserType } from "../types";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
-interface UserContextStore {
-	user: UserType | null;
-	setUser: (user: UserType | null) => void;
-}
+const useUserContext = () => {
+	const context = useContext(UserContext);
+	return context;
+};
 
-const useRegisterModal = create<UserContextStore>((set) => ({
-	user: null,
-	setUser: (user) => set({ user: user }),
-}));
-
-export default useRegisterModal;
+export default useUserContext;

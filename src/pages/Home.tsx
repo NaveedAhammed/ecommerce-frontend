@@ -28,7 +28,7 @@ const Home = () => {
 		};
 
 		(featuredProducts.length === 0 || !billboard) && getHomePageData();
-	}, []);
+	}, [billboard, featuredProducts]);
 
 	if (isLoading)
 		return (

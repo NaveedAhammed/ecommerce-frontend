@@ -3,11 +3,13 @@ import useUserContext from "../hooks/useUserContext";
 import useRefreshToken from "../hooks/useRefreshToken";
 import Loader from "./Loader";
 import { Outlet } from "react-router-dom";
+import { UserContextType } from "../context/UserContext";
 
 const PersistLogin = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const refresh = useRefreshToken();
-	const { user } = useUserContext();
+	const { userState } = useUserContext() as UserContextType;
+	const isLoggedIn = localStorage.getItem("isLoggedIn");
 
 	useEffect(() => {
 		const verifyRefreshToken = async () => {
@@ -21,8 +23,11 @@ const PersistLogin = () => {
 			}
 		};
 
-		!user?.accessToken && verifyRefreshToken();
-	}, [user, refresh]);
+		isLoggedIn &&
+			isLoggedIn === "true" &&
+			!userState?.accessToken &&
+			verifyRefreshToken();
+	}, [userState, refresh, isLoggedIn]);
 
 	return (
 		<div className="w-full min-h-[100vh] flex items-center justify-center">

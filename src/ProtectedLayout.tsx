@@ -1,13 +1,18 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import useUserContext from "./hooks/useUserContext";
+import { UserContextType } from "./context/UserContext";
 
 const ProtectedLayout = () => {
-	const { user } = useUserContext();
+	const { userState } = useUserContext() as UserContextType;
 	const location = useLocation();
-	const redirect =
-		location.pathname === "/" ? "/" : location.pathname.replace("/", "");
-	if (!user) {
-		return <Navigate to={`/login?redirect=${redirect}`} />;
+	if (!userState) {
+		return (
+			<Navigate
+				to={`/login?redirect=${location.pathname}`}
+				replace
+				state={{ redirect: location }}
+			/>
+		);
 	}
 	return <Outlet />;
 };

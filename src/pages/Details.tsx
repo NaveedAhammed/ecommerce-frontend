@@ -1,6 +1,6 @@
 import Button from "../components/Button";
 import { IProduct } from "../types";
-import { PiHeartDuotone } from "react-icons/pi";
+import { PiHeartDuotone, PiHeartFill } from "react-icons/pi";
 import { FaPlus, FaMinus } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { FaCartShopping } from "react-icons/fa6";
@@ -11,14 +11,52 @@ import { useParams } from "react-router-dom";
 import Loader from "../components/Loader";
 import { currencyFormatter } from "../utils/currencyFormat";
 import multiColor from "../assets/multiColor.svg";
+import useUserContext from "../hooks/useUserContext";
+import { UserContextType } from "../context/UserContext";
+import { AxiosError } from "axios";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import toast from "react-hot-toast";
 
 const Details = () => {
 	const [quantity, setQuantity] = useState(1);
 	const [index, setIndex] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
 	const [product, setProduct] = useState<IProduct | null>(null);
+	const [similarProducts, setSimilarProduct] = useState([]);
+
+	const { userState, addWishlistId, removeWishlistId } =
+		useUserContext() as UserContextType;
+
+	const axiosPrivate = useAxiosPrivate();
 
 	const { id } = useParams();
+
+	const isInWishlist = userState?.wishlistIds?.includes(id as string);
+
+	const [isAddedtoWishlist, setIsAddedtoWishlist] = useState(isInWishlist);
+
+	const handleAddOrRemoveWishlistId = () => {
+		const res = axiosPrivate.post(`/user/wishlist/${product?._id}`);
+		toast.promise(res, {
+			loading: "Adding to wishlist...",
+			success: (res) => {
+				setIsAddedtoWishlist((prev) => !prev);
+				isInWishlist
+					? removeWishlistId(id as string)
+					: addWishlistId(id as string);
+				return res.data.message;
+			},
+			error: (err) => {
+				const error = err as AxiosError;
+				console.log(error);
+				if (!error?.response) {
+					return "Something went wrong";
+				} else {
+					return `${error.response?.data?.message}`;
+				}
+			},
+		});
+	};
 
 	useEffect(() => {
 		const getProductDetails = async () => {
@@ -35,6 +73,21 @@ const Details = () => {
 
 		getProductDetails();
 	}, [id]);
+
+	useEffect(() => {
+		const getSimilarProduct = async () => {
+			try {
+				const res = await await publicAxios.get(
+					`/products/similar/${product?.category._id}`
+				);
+				setSimilarProduct(res.data.data.similarProducts);
+			} catch (err) {
+				console.log(err);
+			}
+		};
+
+		product?.category._id && getSimilarProduct();
+	}, [product?.category._id]);
 
 	if (isLoading) {
 		return (
@@ -74,12 +127,23 @@ const Details = () => {
 							</div>
 						</div>
 						<div className="flex flex-col w-[65%]">
-							<div className="flex justify-between gap-8 mb-6">
-								<h1 className="text-2xl">{product.title}</h1>
-								<PiHeartDuotone
-									size={30}
-									className="cursor-pointer hover:scale-105"
-								/>
+							<div className="flex justify-between mb-6">
+								<h1 className="text-2xl w-[95%]">
+									{product.title}
+								</h1>
+								{isAddedtoWishlist || isInWishlist ? (
+									<PiHeartFill
+										className="text-red-500 cursor-pointer hover:scale-110 w-[5%]"
+										size={30}
+										onClick={handleAddOrRemoveWishlistId}
+									/>
+								) : (
+									<PiHeartDuotone
+										className="cursor-pointer hover:scale-110 w-[5%]"
+										size={30}
+										onClick={handleAddOrRemoveWishlistId}
+									/>
+								)}
 							</div>
 							<p className="flex flex-col gap-2 mb-6">
 								<span className="text-lg text-mutedForeground">
@@ -212,14 +276,16 @@ const Details = () => {
 							</Button>
 						</div>
 					</div>
-					<>
-						<Heading
-							title="Suggetions"
-							action={() => {}}
-							actionLabel="Show more"
-						/>
-						{/* <Carousel /> */}
-					</>
+					{similarProducts.length > 0 && (
+						<>
+							<Heading
+								title="Similar Products"
+								action={() => {}}
+								actionLabel="Show more"
+							/>
+							<Carousel products={similarProducts} />
+						</>
+					)}
 				</>
 			)}
 		</>

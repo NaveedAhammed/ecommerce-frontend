@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import { privateAxios } from "../utils/axios";
 import useRefreshToken from "./useRefreshToken";
 import useUserContext from "./useUserContext";
+import { UserContextType } from "../context/UserContext";
 
 const useAxiosPrivate = () => {
 	const refresh = useRefreshToken();
-	const { user } = useUserContext();
+	const { userState, setUser } = useUserContext() as UserContextType;
 
 	useEffect(() => {
 		const requestIntercept = privateAxios.interceptors.request.use(
@@ -13,7 +14,7 @@ const useAxiosPrivate = () => {
 				if (!config.headers["Authorization"]) {
 					config.headers[
 						"Authorization"
-					] = `Bearer ${user?.accessToken}`;
+					] = `Bearer ${userState?.accessToken}`;
 				}
 				return config;
 			},
@@ -34,9 +35,6 @@ const useAxiosPrivate = () => {
 					] = `Bearer ${newAccessToken}`;
 					return privateAxios(prevRequest);
 				}
-				// if (error?.response?.status === 401 && !prevRequest?.sent) {
-				// 	setUser(null);
-				// }
 				return Promise.reject(error);
 			}
 		);
@@ -45,7 +43,7 @@ const useAxiosPrivate = () => {
 			privateAxios.interceptors.response.eject(responseInercept);
 			privateAxios.interceptors.request.eject(requestIntercept);
 		};
-	}, [refresh, user]);
+	}, [refresh, userState, setUser]);
 
 	return privateAxios;
 };

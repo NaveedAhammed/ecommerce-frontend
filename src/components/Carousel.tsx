@@ -1,4 +1,4 @@
-import CarouselItem from "./CarouselItem";
+import ProductItem from "./ProductItem";
 import { IProduct } from "../types";
 import { IoArrowBackOutline, IoArrowForwardOutline } from "react-icons/io5";
 import Button from "./Button";
@@ -30,34 +30,38 @@ const Carousel: React.FC<{ products: IProduct[] }> = ({ products }) => {
 
 	return (
 		<div className="w-full relative mb-4">
-			<Button
-				size="icon"
-				varient="outline"
-				className="absolute top-[50%] left-0 translate-x-[-30%] shadow-md translate-y-[-50%] z-[5]"
-				onClick={() => handleSlide("left")}
-				disabled={index === 0}
-			>
-				<IoArrowBackOutline />
-			</Button>
+			{products?.length > 6 && (
+				<Button
+					size="icon"
+					varient="outline"
+					className="absolute top-[50%] left-0 translate-x-[-30%] shadow-md translate-y-[-50%] z-[5]"
+					onClick={() => handleSlide("left")}
+					disabled={index === 0}
+				>
+					<IoArrowBackOutline />
+				</Button>
+			)}
 			<div className="w-full overflow-hidden">
 				<div
 					className="flex items-center gap-5 transition duration-500"
 					ref={sliderRef}
 				>
 					{products?.map((product) => (
-						<CarouselItem product={product} key={product._id} />
+						<ProductItem product={product} key={product._id} />
 					))}
 				</div>
 			</div>
-			<Button
-				size="icon"
-				varient="outline"
-				className="absolute top-[50%] right-0 translate-x-[30%] translate-y-[-50%] shadow-md z-[5]"
-				onClick={() => handleSlide("right")}
-				disabled={index > 3}
-			>
-				<IoArrowForwardOutline />
-			</Button>
+			{products?.length > 6 && (
+				<Button
+					size="icon"
+					varient="outline"
+					className="absolute top-[50%] right-0 translate-x-[30%] translate-y-[-50%] shadow-md z-[5]"
+					onClick={() => handleSlide("right")}
+					disabled={index > products?.length - 7}
+				>
+					<IoArrowForwardOutline />
+				</Button>
+			)}
 		</div>
 	);
 };

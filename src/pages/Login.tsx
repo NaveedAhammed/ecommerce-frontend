@@ -10,7 +10,8 @@ import { privateAxios } from "../utils/axios";
 import { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import useUserContext from "../hooks/useUserContext";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { UserContextType } from "../context/UserContext";
 
 const Login = () => {
 	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
@@ -25,11 +26,11 @@ const Login = () => {
 
 	const usernameOrEmailRef = useRef<HTMLInputElement>(null);
 
-	const [searchParams] = useSearchParams();
-
-	const { setUser, user } = useUserContext();
+	const { setUser, userState } = useUserContext() as UserContextType;
 
 	const navigate = useNavigate();
+
+	const { state: locationState } = useLocation();
 
 	const handleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -49,11 +50,13 @@ const Login = () => {
 				}
 				const { user: userData, accessToken } = res.data;
 				setUser({
+					_id: userData.id,
 					username: userData.username,
 					accessToken,
-					id: userData.id,
 					avatar: userData?.avatar,
+					wishlistIds: userData?.wishlistIds,
 				});
+				localStorage.setItem("isLoggedIn", "true");
 			} catch (err: unknown) {
 				console.log(err);
 				const error = err as AxiosError;
@@ -76,11 +79,15 @@ const Login = () => {
 	}, []);
 
 	useEffect(() => {
-		if (user) {
-			const redirect = searchParams.get("redirect") || "/";
-			navigate(redirect);
+		if (userState) {
+			if (locationState) {
+				const { redirect } = locationState;
+				console.log(redirect);
+				return navigate(`${redirect.pathname}${redirect.search}`);
+			}
+			navigate("/");
 		}
-	}, [user, navigate, searchParams]);
+	}, [userState, navigate, locationState]);
 
 	return (
 		<div className="h-full min-h-[100vh] flex items-center justify-center w-full">

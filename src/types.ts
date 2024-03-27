@@ -1,8 +1,9 @@
 export type UserType = {
+	_id: string;
 	username: string;
 	avatar?: string | undefined;
 	accessToken: string;
-	id: string;
+	wishlistIds: string[];
 };
 
 export interface IBillboard {

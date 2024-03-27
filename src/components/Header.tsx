@@ -5,6 +5,8 @@ import useUserContext from "../hooks/useUserContext";
 import Input from "./Input";
 import { FaCartShopping } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
+import { UserContextType } from "../context/UserContext";
+import { useState } from "react";
 
 const activeLink = ({ isActive }: { isActive: boolean }) => {
 	return `text-sm font-medium transition-colors hover:text-primary ${
@@ -13,7 +15,8 @@ const activeLink = ({ isActive }: { isActive: boolean }) => {
 };
 
 const Header = () => {
-	const { user } = useUserContext();
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const { userState } = useUserContext() as UserContextType;
 	const navigate = useNavigate();
 	return (
 		<header className="w-full border-b py-3 sticky top-0 left-0 z-[99] bg-background">
@@ -31,15 +34,9 @@ const Header = () => {
 					<NavLink to="/products" className={activeLink}>
 						Products
 					</NavLink>
-					<NavLink to="/wishlist" className={activeLink}>
-						Wishlist
-					</NavLink>
-					<NavLink to="/orders" className={activeLink}>
-						Orders
-					</NavLink>
 				</nav>
 				<div className="flex items-center gap-4">
-					<div className="flex items-center gap-2 w-96">
+					<div className="flex items-center gap-2 w-[35rem]">
 						<Input
 							id="search"
 							name="search"
@@ -60,7 +57,7 @@ const Header = () => {
 						<span className="mr-2">9</span>
 						<FaCartShopping />
 					</Button>
-					{!user && (
+					{!userState && (
 						<Button
 							onClick={() => navigate("/login")}
 							size="sm"
@@ -69,17 +66,52 @@ const Header = () => {
 							Login
 						</Button>
 					)}
-					{user && (
-						<Button varient="outline" size="icon">
-							{user?.avatar && (
-								<img
-									src={user.avatar}
-									alt={user.username}
-									className="w-full h-full rounded-[999px]"
-								/>
+					{userState && (
+						<Button
+							varient="outline"
+							size="icon"
+							className="relative"
+							onClick={() => setIsMenuOpen((prev) => !prev)}
+						>
+							{userState?.avatar && (
+								<div>
+									<img
+										src={userState?.avatar}
+										alt={userState.username}
+										className="w-full h-full rounded-[999px]"
+									/>
+								</div>
 							)}
-							{!user?.avatar && (
+							{!userState?.avatar && (
 								<GoPerson className="rounded-[999px]" />
+							)}
+							{isMenuOpen && (
+								<div className="flex flex-col items-start absolute top-[120%] right-0 w-36 bg-white shadow-md rounded-md py-2">
+									<Link
+										to="/myProfile"
+										className="py-2 px-4 hover:bg-secondary w-full text-start"
+									>
+										My Profile
+									</Link>
+									<Link
+										to="/wishlist"
+										className="py-2 px-4 hover:bg-secondary w-full text-start"
+									>
+										Wishlist
+									</Link>
+									<Link
+										to="/orders"
+										className="py-2 px-4 hover:bg-secondary w-full text-start"
+									>
+										Orders
+									</Link>
+									<div
+										className="py-2 px-4 hover:bg-secondary w-full text-start"
+										onClick={() => {}}
+									>
+										Logout
+									</div>
+								</div>
 							)}
 						</Button>
 					)}

@@ -1,9 +1,38 @@
 export type UserType = {
 	_id: string;
 	username: string;
-	avatar?: string | undefined;
+	email: string;
+	phone?: number;
+	avatar?: string;
+	gender?: string;
 	accessToken: string;
 	wishlistIds: string[];
+	cart: CartItem[];
+	shippingAddresses: IShippingInfo[];
+};
+
+export interface IShippingInfo {
+	_id?: string;
+	name: string;
+	locality: string;
+	address: string;
+	city: string;
+	state: IState;
+	pincode: number;
+	phone: number;
+	alternatePhone?: number;
+	addressType: string;
+}
+
+export interface IState {
+	id: string;
+	name: string;
+}
+
+export type CartItem = {
+	_id: string;
+	productId: string;
+	quantity: number;
 };
 
 export interface IBillboard {

@@ -13,18 +13,20 @@ import { currencyFormatter } from "../utils/currencyFormat";
 import multiColor from "../assets/multiColor.svg";
 import useUserContext from "../hooks/useUserContext";
 import { UserContextType } from "../context/UserContext";
-import { AxiosError } from "axios";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import toast from "react-hot-toast";
+import { errorHandler } from "../utils/errorHandler";
+import axios from "axios";
 
 const Details = () => {
 	const [quantity, setQuantity] = useState(1);
 	const [index, setIndex] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isLoadingCart, setIsLoadingCart] = useState(false);
 	const [product, setProduct] = useState<IProduct | null>(null);
 	const [similarProducts, setSimilarProduct] = useState([]);
 
-	const { userState, addWishlistId, removeWishlistId } =
+	const { userState, setWishlistIds, setUserState } =
 		useUserContext() as UserContextType;
 
 	const axiosPrivate = useAxiosPrivate();
@@ -41,53 +43,79 @@ const Details = () => {
 			loading: "Adding to wishlist...",
 			success: (res) => {
 				setIsAddedtoWishlist((prev) => !prev);
-				isInWishlist
-					? removeWishlistId(id as string)
-					: addWishlistId(id as string);
+				setWishlistIds(res.data.data.user?.wishlistIds);
 				return res.data.message;
 			},
 			error: (err) => {
-				const error = err as AxiosError;
-				console.log(error);
-				if (!error?.response) {
-					return "Something went wrong";
-				} else {
-					return `${error.response?.data?.message}`;
+				if (axios.isAxiosError<{ message: string }>(err)) {
+					if (!err?.response) {
+						return "Something went wrong";
+					} else {
+						return `${err.response?.data?.message}`;
+					}
 				}
+				return "Unexpected error!";
 			},
 		});
 	};
 
+	const handleAddToCart = () => {
+		const formData = new FormData();
+		formData.append("quantity", `${quantity}`);
+		setIsLoadingCart(true);
+		axiosPrivate
+			.post(`/user/cart/add/${product?._id}`, formData)
+			.then((res) => {
+				if (!res.data.success) {
+					return toast.error(
+						"Adding to cart failed, Please try again"
+					);
+				}
+				setUserState((prev) => {
+					if (prev) {
+						return { ...prev, cart: res.data.data.user.cart };
+					}
+					return null;
+				});
+				return toast.success(res.data.message);
+			})
+			.catch(errorHandler)
+			.finally(() => {
+				setIsLoadingCart(false);
+			});
+	};
+
 	useEffect(() => {
-		const getProductDetails = async () => {
-			try {
-				setIsLoading(true);
-				const res = await publicAxios.get(`/products/${id}`);
-				setProduct(res.data.data.product);
-			} catch (err) {
-				console.log(err);
-			} finally {
-				setIsLoading(false);
-			}
+		const getProductDetails = () => {
+			setIsLoading(true);
+			publicAxios
+				.get(`/products/${id}`)
+				.then((res) => {
+					setProduct(res.data.data.product);
+				})
+				.catch(errorHandler)
+				.finally(() => {
+					setIsLoading(false);
+				});
 		};
 
 		getProductDetails();
 	}, [id]);
 
 	useEffect(() => {
-		const getSimilarProduct = async () => {
-			try {
-				const res = await await publicAxios.get(
-					`/products/similar/${product?.category._id}`
-				);
-				setSimilarProduct(res.data.data.similarProducts);
-			} catch (err) {
-				console.log(err);
-			}
+		const getSimilarProduct = () => {
+			publicAxios
+				.get(
+					`/products/similar/${product?.category._id}?productId=${product?._id}`
+				)
+				.then((res) => {
+					setSimilarProduct(res.data.data.similarProducts);
+				})
+				.catch(errorHandler);
 		};
 
 		product?.category._id && getSimilarProduct();
-	}, [product?.category._id]);
+	}, [product?.category._id, product?._id]);
 
 	if (isLoading) {
 		return (
@@ -268,10 +296,21 @@ const Details = () => {
 							<Button
 								varient="default"
 								size="default"
-								className="w-40 gap-2"
+								className="w-fit gap-2"
 								disabled={product.stock === 0}
+								onClick={handleAddToCart}
 							>
-								<span>Add to Cart</span>
+								{isLoadingCart && (
+									<Loader
+										width="1rem"
+										height="1rem"
+										color="white"
+									/>
+								)}
+								{isLoadingCart
+									? "Adding to Cart..."
+									: "Add to Cart"}
+
 								<FaCartShopping />
 							</Button>
 						</div>

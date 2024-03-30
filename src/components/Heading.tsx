@@ -1,6 +1,5 @@
 import Button from "./Button";
 
-// import { GoPlus } from "react-icons/go";
 import { TbAdjustmentsFilled } from "react-icons/tb";
 
 interface HeadingProps {

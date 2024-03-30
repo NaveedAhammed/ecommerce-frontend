@@ -3,31 +3,26 @@ import ProductItem from "../components/ProductItem";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Loader from "../components/Loader";
 import { IProduct } from "../types";
+import { errorHandler } from "../utils/errorHandler";
 
 const Wishlist = () => {
 	const [isLoading, setIsLoading] = useState(false);
-	const [wishlistProducts, setWishlistProduct] = useState<IProduct[]>([]);
+	const [wishlistProducts, setWishlistProducts] = useState<IProduct[]>([]);
 
 	const axiosPrivate = useAxiosPrivate();
 
-	const handleRemove = (productId: string) => {
-		setWishlistProduct((prev) =>
-			prev.filter((pro) => pro._id !== productId)
-		);
-	};
-
 	useEffect(() => {
-		const getWishlistProducts = async () => {
-			try {
-				setIsLoading(true);
-				const res = (await axiosPrivate.get("/products/wishlist")).data;
-				console.log(res);
-				setWishlistProduct(res.data.wishlistProducts);
-			} catch (err) {
-				console.log(err);
-			} finally {
-				setIsLoading(false);
-			}
+		const getWishlistProducts = () => {
+			setIsLoading(true);
+			axiosPrivate
+				.get("/products/wishlist")
+				.then((res) => {
+					setWishlistProducts(res.data.data.wishlistProducts);
+				})
+				.catch(errorHandler)
+				.finally(() => {
+					setIsLoading(false);
+				});
 		};
 
 		getWishlistProducts();
@@ -42,15 +37,15 @@ const Wishlist = () => {
 
 	return (
 		<div className="w-full min-h-[100vh]">
-			<h1 className="text-3xl font-medium mb-6 ">
-				Wishlist Items ({wishlistProducts?.length})
+			<h1 className="text-xl font-medium mb-6 ">
+				My Wishlist ({wishlistProducts?.length})
 			</h1>
-			<div className="grid grid-cols-6 gap-4">
+			<div className="flex flex-wrap gap-5">
 				{wishlistProducts?.map((product) => (
 					<ProductItem
 						product={product}
 						key={product._id}
-						onClick={() => handleRemove(product._id)}
+						setWishlistHook={setWishlistProducts}
 					/>
 				))}
 			</div>

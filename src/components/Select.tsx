@@ -1,40 +1,37 @@
-interface Option {
+import { useFormContext } from "react-hook-form";
+
+export interface IOption {
 	id: string;
 	name: string;
 }
 
 interface SelectProps {
-	options: Option[];
+	options: IOption[];
 	name: string;
 	id: string;
-	defaultValue: string;
 	required?: boolean;
 	className?: string;
-	onFocus?: () => void;
-	onBlur?: () => void;
+	onClick?: () => void;
 }
 
 const Select: React.FC<SelectProps> = ({
 	options,
 	name,
 	id,
-	defaultValue,
 	required,
 	className,
-	onBlur,
-	onFocus,
+	onClick,
 }) => {
+	const { register } = useFormContext();
+
 	return (
 		<select
 			className={`"flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 ${
 				className ? className : ""
 			}`}
-			name={name}
 			id={id}
-			defaultValue={defaultValue}
-			required={required}
-			onFocus={onFocus}
-			onBlur={onBlur}
+			{...register(name, { required })}
+			onClick={onClick}
 		>
 			<option value="" className="text-base">
 				select

@@ -4,6 +4,7 @@ import Heading from "../components/Heading";
 import HeroBanner from "../components/HeroBanner";
 import publicAxios from "../utils/axios";
 import Loader from "../components/Loader";
+import { errorHandler } from "../utils/errorHandler";
 
 const Home = () => {
 	const [billboard, setBillboard] = useState(null);
@@ -12,19 +13,19 @@ const Home = () => {
 
 	useEffect(() => {
 		const getHomePageData = async () => {
-			try {
-				setIsLoading(true);
-				const res = await Promise.all([
-					publicAxios.get("/billboard/active"),
-					publicAxios.get("/products/featured"),
-				]);
-				setBillboard(res[0].data.data.billboard[0]);
-				setFeaturedProducts(res[1].data.data.featuredProducts);
-			} catch (err) {
-				console.log(err);
-			} finally {
-				setIsLoading(false);
-			}
+			setIsLoading(true);
+			Promise.all([
+				publicAxios.get("/billboard/active"),
+				publicAxios.get("/products/featured"),
+			])
+				.then((res) => {
+					setBillboard(res[0].data.data.billboard[0]);
+					setFeaturedProducts(res[1].data.data.featuredProducts);
+				})
+				.catch(errorHandler)
+				.finally(() => {
+					setIsLoading(false);
+				});
 		};
 
 		(featuredProducts.length === 0 || !billboard) && getHomePageData();

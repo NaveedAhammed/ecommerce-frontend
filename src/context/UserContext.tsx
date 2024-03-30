@@ -1,11 +1,13 @@
 import { createContext, useState } from "react";
-import { UserType } from "../types";
+import { CartItem, UserType } from "../types";
 
 export type UserContextType = {
 	userState: UserType | null;
-	setUser: (user: UserType | null) => void;
-	addWishlistId: (productId: string) => void;
-	removeWishlistId: (productId: string) => void;
+	setUserState: React.Dispatch<React.SetStateAction<UserType | null>>;
+	setWishlistIds: (wishlistIds: string[]) => void;
+	setCart: (cart: CartItem[]) => void;
+	removeWishlistId: (wishlistId: string) => void;
+	removeCartItem: (cartItemId: string) => void;
 };
 
 export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -13,30 +15,50 @@ export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
 	const [userState, setUserState] = useState<UserType | null>(null);
 
-	const setUser = (user: UserType | null) => {
-		setUserState(user);
-	};
-
-	const addWishlistId = (productId: string) => {
+	const setWishlistIds = (wishlistIds: string[]) => {
 		setUserState((prev) => {
 			if (prev) {
 				return {
 					...prev,
-					wishlistIds: [...prev.wishlistIds, productId],
+					wishlistIds,
 				};
 			}
 			return null;
 		});
 	};
 
-	const removeWishlistId = (productId: string) => {
+	const removeWishlistId = (wishlistId: string) => {
 		setUserState((prev) => {
 			if (prev) {
 				return {
 					...prev,
 					wishlistIds: prev.wishlistIds.filter(
-						(id) => id !== productId
+						(id) => id !== wishlistId
 					),
+				};
+			}
+			return null;
+		});
+	};
+
+	const removeCartItem = (cartItemId: string) => {
+		setUserState((prev) => {
+			if (prev) {
+				return {
+					...prev,
+					cart: prev.cart.filter((item) => item._id !== cartItemId),
+				};
+			}
+			return null;
+		});
+	};
+
+	const setCart = (cart: CartItem[]) => {
+		setUserState((prev) => {
+			if (prev) {
+				return {
+					...prev,
+					cart,
 				};
 			}
 			return null;
@@ -47,8 +69,10 @@ export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
 		<UserContext.Provider
 			value={{
 				userState,
-				setUser,
-				addWishlistId,
+				setUserState,
+				setWishlistIds,
+				setCart,
+				removeCartItem,
 				removeWishlistId,
 			}}
 		>

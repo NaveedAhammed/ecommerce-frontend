@@ -1,9 +1,14 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import {
+	Navigate,
+	RouterProvider,
+	createBrowserRouter,
+} from "react-router-dom";
 import AppLayout from "./AppLayout";
 import ProtectedLayout from "./ProtectedLayout";
 import PersistLogin from "./components/PersistLogin";
 import { lazy } from "react";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 const Home = lazy(() => import("./pages/Home"));
 const Details = lazy(() => import("./pages/Details"));
@@ -12,6 +17,8 @@ const Products = lazy(() => import("./pages/Products"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Cart = lazy(() => import("./pages/Cart"));
+const Info = lazy(() => import("./pages/Info"));
+const ManageAddresses = lazy(() => import("./pages/ManageAddresses"));
 
 const router = createBrowserRouter([
 	{
@@ -25,31 +32,45 @@ const router = createBrowserRouter([
 						element: <Home />,
 					},
 					{
-						path: "/product/:id",
+						path: "product/:id",
 						element: <Details />,
 					},
 					{
-						path: "/products",
+						path: "products",
 						element: <Products />,
 					},
 					{
 						element: <ProtectedLayout />,
 						children: [
 							{
-								path: "/wishlist",
-								element: <Wishlist />,
-							},
-							{
-								path: "/orders",
-								element: <Orders />,
-							},
-							{
-								path: "/cart",
+								path: "cart",
 								element: <Cart />,
 							},
 							{
-								path: "/myProfile",
+								path: "myProfile",
 								element: <Profile />,
+								children: [
+									{
+										index: true,
+										element: <Navigate to="info" replace />,
+									},
+									{
+										path: "info",
+										element: <Info />,
+									},
+									{
+										path: "wishlist",
+										element: <Wishlist />,
+									},
+									{
+										path: "orders",
+										element: <Orders />,
+									},
+									{
+										path: "addresses",
+										element: <ManageAddresses />,
+									},
+								],
 							},
 						],
 					},
@@ -58,6 +79,10 @@ const router = createBrowserRouter([
 			{
 				path: "login",
 				element: <Login />,
+			},
+			{
+				path: "register",
+				element: <Register />,
 			},
 		],
 	},

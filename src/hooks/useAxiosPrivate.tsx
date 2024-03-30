@@ -6,7 +6,7 @@ import { UserContextType } from "../context/UserContext";
 
 const useAxiosPrivate = () => {
 	const refresh = useRefreshToken();
-	const { userState, setUser } = useUserContext() as UserContextType;
+	const { userState } = useUserContext() as UserContextType;
 
 	useEffect(() => {
 		const requestIntercept = privateAxios.interceptors.request.use(
@@ -43,7 +43,7 @@ const useAxiosPrivate = () => {
 			privateAxios.interceptors.response.eject(responseInercept);
 			privateAxios.interceptors.request.eject(requestIntercept);
 		};
-	}, [refresh, userState, setUser]);
+	}, [refresh, userState]);
 
 	return privateAxios;
 };

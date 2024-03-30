@@ -6,21 +6,26 @@ import { Link } from "react-router-dom";
 import { currencyFormatter } from "../utils/currencyFormat";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
+import axios from "axios";
 import { useState } from "react";
 import useUserContext from "../hooks/useUserContext";
 import { UserContextType } from "../context/UserContext";
+import { FaCheck } from "react-icons/fa6";
 
-const ProductItem: React.FC<{ product: IProduct; onClick?: () => void }> = ({
-	product,
-	onClick,
-}) => {
-	const { userState, addWishlistId, removeWishlistId } =
+const ProductItem: React.FC<{
+	product: IProduct;
+	setWishlistHook?: React.Dispatch<React.SetStateAction<IProduct[]>>;
+}> = ({ product, setWishlistHook }) => {
+	const { userState, setCart, setWishlistIds } =
 		useUserContext() as UserContextType;
 
 	const isInWishlist = userState?.wishlistIds?.includes(product._id);
+	const isInCart = userState?.cart
+		?.map((it) => it.productId)
+		.includes(product._id);
 
 	const [isAddedtoWishlist, setIsAddedtoWishlist] = useState(isInWishlist);
+	const [isAddedtoCart, setIsAddedtoCart] = useState(isInCart);
 
 	const axiosPrivate = useAxiosPrivate();
 
@@ -30,29 +35,54 @@ const ProductItem: React.FC<{ product: IProduct; onClick?: () => void }> = ({
 			loading: "Adding to wishlist...",
 			success: (res) => {
 				setIsAddedtoWishlist((prev) => !prev);
-				if (isInWishlist) {
-					removeWishlistId(product._id);
-					onClick();
-				} else {
-					addWishlistId(product._id);
+				if (isInWishlist && setWishlistHook) {
+					setWishlistHook((prev) =>
+						prev.filter((it) => it._id !== product._id)
+					);
 				}
+				setWishlistIds(res.data.data.user.wishlistIds);
 				return res.data.message;
 			},
 			error: (err) => {
-				const error = err as AxiosError;
-				console.log(error);
-				if (!error?.response) {
-					return "Something went wrong";
-				} else {
-					return `${error.response?.data?.message}`;
+				if (axios.isAxiosError<{ message: string }>(err)) {
+					if (!err?.response) {
+						return "Something went wrong";
+					} else {
+						return `${err.response?.data?.message}`;
+					}
 				}
+				return "Unexpected error!";
+			},
+		});
+	};
+
+	const handleAddToCart = () => {
+		const formData = new FormData();
+		formData.append("quantity", "1");
+		const res = axiosPrivate.post(`/user/cart/${product._id}`, formData);
+		toast.promise(res, {
+			loading: "Adding to cart...",
+			success: (res) => {
+				setIsAddedtoCart((prev) => !prev);
+				setCart(res.data.data.user?.cart);
+				return res.data.message;
+			},
+			error: (err) => {
+				if (axios.isAxiosError<{ message: string }>(err)) {
+					if (!err?.response) {
+						return "Something went wrong";
+					} else {
+						return `${err.response?.data?.message}`;
+					}
+				}
+				return "Unexpected error!";
 			},
 		});
 	};
 
 	return (
 		<div className="p-3 rounded-md border relative group w-[216.66px] flex-shrink-0 shadow-md">
-			{isAddedtoWishlist || isInWishlist ? (
+			{isAddedtoWishlist ? (
 				<PiHeartFill
 					className="absolute top-4 right-4 text-red-500 cursor-pointer z-[5] hover:scale-110"
 					size={24}
@@ -67,13 +97,24 @@ const ProductItem: React.FC<{ product: IProduct; onClick?: () => void }> = ({
 			)}
 			<div className="w-full h-48 rounded-md overflow-hidden cursor-pointer relative mb-2">
 				<div className="w-full h-full bg-black/20 absolute top-0 left-0 z-[2] items-center justify-center group-hover:flex hidden">
-					<Button
-						varient="outline"
-						size="icon"
-						className="hover:scale-110"
-					>
-						<FaCartShopping />
-					</Button>
+					{!isAddedtoCart ? (
+						<Button
+							varient="outline"
+							size="icon"
+							className="hover:scale-110"
+							onClick={handleAddToCart}
+						>
+							<FaCartShopping />
+						</Button>
+					) : (
+						<Button
+							varient="outline"
+							size="icon"
+							className="hover:scale-110"
+						>
+							<FaCheck />
+						</Button>
+					)}
 				</div>
 				<img
 					src={product?.images?.[0].url}

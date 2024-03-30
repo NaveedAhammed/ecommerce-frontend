@@ -7,6 +7,7 @@ import { FaCartShopping } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
 import { UserContextType } from "../context/UserContext";
 import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
 const activeLink = ({ isActive }: { isActive: boolean }) => {
 	return `text-sm font-medium transition-colors hover:text-primary ${
@@ -18,6 +19,7 @@ const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const { userState } = useUserContext() as UserContextType;
 	const navigate = useNavigate();
+	const methods = useForm();
 	return (
 		<header className="w-full border-b py-3 sticky top-0 left-0 z-[99] bg-background">
 			<div className="w-full max-w-[1400px] mx-auto flex items-center justify-between">
@@ -37,13 +39,15 @@ const Header = () => {
 				</nav>
 				<div className="flex items-center gap-4">
 					<div className="flex items-center gap-2 w-[35rem]">
-						<Input
-							id="search"
-							name="search"
-							autoComplete="on"
-							type="text"
-							placeholder="Search here..."
-						/>
+						<FormProvider {...methods}>
+							<Input
+								id="search"
+								name="search"
+								autoComplete="on"
+								type="text"
+								placeholder="Search here..."
+							/>
+						</FormProvider>
 						<Button size="default" varient="default">
 							<IoSearch className="mr-2" />
 							Search
@@ -54,7 +58,7 @@ const Header = () => {
 						varient="ghost"
 						onClick={() => navigate("/cart")}
 					>
-						<span className="mr-2">9</span>
+						<span className="mr-2">{userState?.cart.length}</span>
 						<FaCartShopping />
 					</Button>
 					{!userState && (
@@ -94,13 +98,13 @@ const Header = () => {
 										My Profile
 									</Link>
 									<Link
-										to="/wishlist"
+										to="/myProfile/wishlist"
 										className="py-2 px-4 hover:bg-secondary w-full text-start"
 									>
 										Wishlist
 									</Link>
 									<Link
-										to="/orders"
+										to="/myProfile/orders"
 										className="py-2 px-4 hover:bg-secondary w-full text-start"
 									>
 										Orders

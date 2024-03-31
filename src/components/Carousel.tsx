@@ -41,7 +41,7 @@ const Carousel: React.FC<{ products: IProduct[] }> = ({ products }) => {
 					<IoArrowBackOutline />
 				</Button>
 			)}
-			<div className="w-full overflow-hidden">
+			<div className="w-full overflow-hidden py-3">
 				<div
 					className="flex items-center gap-5 transition duration-500"
 					ref={sliderRef}

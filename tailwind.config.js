@@ -19,6 +19,10 @@ export default {
 				ring: "hsl(215 20.2% 65.1%)",
 				success: "hsl(120, 100%, 50%)",
 				successForground: "#009A00",
+				facebook: "#4167B2",
+				instagram: "#D52D85",
+				twitter: "#1DA1F1",
+				linkedin: "#0077B5",
 			},
 		},
 		fontFamily: {

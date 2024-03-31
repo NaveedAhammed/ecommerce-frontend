@@ -123,9 +123,12 @@ const ProductItem: React.FC<{
 				/>
 			</div>
 			<div className="flex flex-col gap-1">
+				<span className="text-xs text-mutedForeground font-semibold">
+					{product.brand}
+				</span>
 				<Link to={`/product/${product._id}`}>
 					<span className="text-sm cursor-pointer group-hover:underline">
-						{product?.title?.slice(0, 23)}...
+						{product?.title?.slice(0, 20)}...
 					</span>
 				</Link>
 				<div className="flex items-center gap-2">
@@ -141,7 +144,7 @@ const ProductItem: React.FC<{
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2">
 						{product.discount > 0 && (
-							<span className="line-through text-sm text-mutedForeground">
+							<span className="line-through text-xs text-mutedForeground">
 								{
 									currencyFormatter
 										.format(product?.price)
@@ -149,7 +152,7 @@ const ProductItem: React.FC<{
 								}
 							</span>
 						)}
-						<span className="text-lg font-bold">
+						<span className="text-[14px] font-bold">
 							{
 								currencyFormatter
 									.format(
@@ -162,15 +165,24 @@ const ProductItem: React.FC<{
 						</span>
 					</div>
 					<div className="flex items-center gap-2">
-						<span className="text-xs">
-							{product.unit?.shortHand}
-						</span>
-						<div
-							className={`w-4 h-4 rounded-full border`}
-							style={{
-								backgroundColor: `${product.color?.value}`,
-							}}
-						></div>
+						{product.unit?.shortHand && (
+							<span className="text-xs">
+								{product.unit?.shortHand}
+							</span>
+						)}
+						{product.unit?.value && (
+							<span className="text-xs">
+								{product.unit?.value}
+							</span>
+						)}
+						{product?.color && (
+							<div
+								className={`w-4 h-4 rounded-full border`}
+								style={{
+									backgroundColor: `${product.color?.value}`,
+								}}
+							></div>
+						)}
 					</div>
 				</div>
 			</div>

@@ -12,7 +12,7 @@ const AddressItem: React.FC<{
 	return (
 		<div className="flex flex-col gap-1 w-full p-4 border-b">
 			<div className="w-full flex items-center justify-between">
-				<span className="p-2 bg-gray-100 rounded-md text-[10px] uppercase">
+				<span className="p-2 bg-gray-100 rounded-md text-[10px] uppercase tracking-widest">
 					{shippingInfo?.addressType}
 				</span>
 				<Button

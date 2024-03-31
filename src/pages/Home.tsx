@@ -9,6 +9,7 @@ import { errorHandler } from "../utils/errorHandler";
 const Home = () => {
 	const [billboard, setBillboard] = useState(null);
 	const [featuredProducts, setFeaturedProducts] = useState([]);
+	const [newArrivalProducts, setNewArrivalProducts] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
@@ -17,10 +18,12 @@ const Home = () => {
 			Promise.all([
 				publicAxios.get("/billboard/active"),
 				publicAxios.get("/products/featured"),
+				publicAxios.get("/products/newArrivals"),
 			])
 				.then((res) => {
 					setBillboard(res[0].data.data.billboard[0]);
 					setFeaturedProducts(res[1].data.data.featuredProducts);
+					setNewArrivalProducts(res[2].data.data.newArrivalProducts);
 				})
 				.catch(errorHandler)
 				.finally(() => {
@@ -48,6 +51,14 @@ const Home = () => {
 					actionLabel="Show more"
 				/>
 				<Carousel products={featuredProducts} />
+			</>
+			<>
+				<Heading
+					title="New Arrivals"
+					action={() => {}}
+					actionLabel="Show more"
+				/>
+				<Carousel products={newArrivalProducts} />
 			</>
 		</>
 	);

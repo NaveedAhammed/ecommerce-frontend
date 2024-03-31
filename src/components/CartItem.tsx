@@ -129,6 +129,12 @@ const CartItem: React.FC<{
 								{product.discount}%
 							</span>
 						)}
+						<div className="flex items-center gap-1 text-sm">
+							<span>Brand:</span>
+							<span className="text-mutedForeground font-semibold">
+								{product.brand}
+							</span>
+						</div>
 					</div>
 					<div className="flex items-center gap-6 text-sm">
 						<div className="flex items-center gap-2">

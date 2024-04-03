@@ -2,7 +2,7 @@ import { IProduct } from "../types";
 import { PiHeartDuotone, PiHeartFill } from "react-icons/pi";
 import { FaCartShopping } from "react-icons/fa6";
 import Button from "./Button";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { currencyFormatter } from "../utils/currencyFormat";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import toast from "react-hot-toast";
@@ -15,9 +15,13 @@ import { FaCheck } from "react-icons/fa6";
 const ProductItem: React.FC<{
 	product: IProduct;
 	setWishlistHook?: React.Dispatch<React.SetStateAction<IProduct[]>>;
-}> = ({ product, setWishlistHook }) => {
+	className?: string;
+}> = ({ product, setWishlistHook, className }) => {
 	const { userState, setCart, setWishlistIds } =
 		useUserContext() as UserContextType;
+
+	const navigate = useNavigate();
+	const location = useLocation();
 
 	const isInWishlist = userState?.wishlistIds?.includes(product._id);
 	const isInCart = userState?.cart
@@ -57,6 +61,11 @@ const ProductItem: React.FC<{
 	};
 
 	const handleAddToCart = () => {
+		if (!userState) {
+			return navigate(`/login?redirect=${location.pathname}`, {
+				state: { redirect: location },
+			});
+		}
 		const formData = new FormData();
 		formData.append("quantity", "1");
 		const res = axiosPrivate.post(`/user/cart/${product._id}`, formData);
@@ -81,7 +90,11 @@ const ProductItem: React.FC<{
 	};
 
 	return (
-		<div className="p-3 rounded-md border relative group w-[216.66px] flex-shrink-0 shadow-md">
+		<div
+			className={`p-3 rounded-md border relative group w-[216.66px] flex-shrink-0 shadow-md ${
+				className ? className : ""
+			}`}
+		>
 			{isAddedtoWishlist ? (
 				<PiHeartFill
 					className="absolute top-4 right-4 text-red-500 cursor-pointer z-[5] hover:scale-110"
@@ -170,7 +183,7 @@ const ProductItem: React.FC<{
 								{product.unit?.shortHand}
 							</span>
 						)}
-						{product.unit?.value && (
+						{product.unit?.value && !product?.unit?.shortHand && (
 							<span className="text-xs">
 								{product.unit?.value}
 							</span>

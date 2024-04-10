@@ -188,7 +188,7 @@ const Checkout = () => {
 	const handleMakePayment = async () => {
 		console.log(selectedAddress);
 		const stripe: Stripe | null = await loadStripe(
-			import.meta.env.VITE_PUBLISHABLE_KEY
+			import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 		);
 		const res = await axiosPrivate.post("/create-checkout-session", {
 			selectedAddress,

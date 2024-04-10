@@ -92,6 +92,7 @@ const Info = () => {
 					return null;
 				});
 				setAvatar(null);
+				toast.success(res.data.message);
 			})
 			.catch(errorHandler)
 			.finally(() => {

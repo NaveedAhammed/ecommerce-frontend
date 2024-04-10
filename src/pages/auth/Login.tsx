@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { GoEye, GoEyeClosed } from "react-icons/go";
 
-import Button from "../components/Button";
-import Label from "../components/Label";
-import Loader from "../components/Loader";
-import Message from "../components/Message";
-import { privateAxios } from "../utils/axios";
+import Button from "../../components/Button";
+import Label from "../../components/Label";
+import Loader from "../../components/Loader";
+import Message from "../../components/Message";
+import { privateAxios } from "../../utils/axios";
 import toast from "react-hot-toast";
-import useUserContext from "../hooks/useUserContext";
+import useUserContext from "../../hooks/useUserContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { UserContextType } from "../context/UserContext";
+import { UserContextType } from "../../context/UserContext";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import Input from "../components/Input";
-import { errorHandler } from "../utils/errorHandler";
+import Input from "../../components/Input";
+import { errorHandler } from "../../utils/errorHandler";
 
 interface IFormInput {
 	usernameOrEmail: string;
@@ -183,9 +183,12 @@ const Login = () => {
 						</Button>
 					</form>
 				</FormProvider>
-				<div className="w-full text-right mt-4 hover:underline cursor-pointer">
+				<Link
+					to="/forgotPassword"
+					className="w-full block text-right mt-4 hover:underline cursor-pointer"
+				>
 					Forgot password?
-				</div>
+				</Link>
 				<div className="w-full mt-4 flex items-center justify-center gap-2">
 					<span className="">Don&apos;t have an account?</span>
 					<Link to="/register" className="hover:underline">

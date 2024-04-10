@@ -4,7 +4,7 @@ const HeroBanner: React.FC<{ heroBanner: IBillboard | null }> = ({
 	heroBanner,
 }) => {
 	return (
-		<div className="py-4 cursor-pointer w-full h-[24rem]">
+		<div className="my-4 cursor-pointer w-full h-[24rem]">
 			<h1></h1>
 			<img
 				src={heroBanner?.imageUrl}

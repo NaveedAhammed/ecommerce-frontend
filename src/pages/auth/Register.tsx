@@ -3,18 +3,18 @@ import { GoEye, GoEyeClosed } from "react-icons/go";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import Button from "../components/Button";
-import Label from "../components/Label";
-import Loader from "../components/Loader";
-import Message from "../components/Message";
-import { privateAxios } from "../utils/axios";
+import Button from "../../components/Button";
+import Label from "../../components/Label";
+import Loader from "../../components/Loader";
+import Message from "../../components/Message";
+import { privateAxios } from "../../utils/axios";
 import toast from "react-hot-toast";
-import useUserContext from "../hooks/useUserContext";
+import useUserContext from "../../hooks/useUserContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { UserContextType } from "../context/UserContext";
-import Input from "../components/Input";
+import { UserContextType } from "../../context/UserContext";
+import Input from "../../components/Input";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { errorHandler } from "../utils/errorHandler";
+import { errorHandler } from "../../utils/errorHandler";
 
 interface IFormInput {
 	username: string;

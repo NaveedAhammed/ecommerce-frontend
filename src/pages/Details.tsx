@@ -7,7 +7,7 @@ import { FaCartShopping } from "react-icons/fa6";
 import Heading from "../components/Heading";
 import Carousel from "../components/Carousel";
 import publicAxios from "../utils/axios";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Loader from "../components/Loader";
 import { currencyFormatter } from "../utils/currencyFormat";
 import multiColor from "../assets/multiColor.svg";
@@ -31,6 +31,9 @@ const Details = () => {
 
 	const axiosPrivate = useAxiosPrivate();
 
+	const navigate = useNavigate();
+	const location = useLocation();
+
 	const { id } = useParams();
 
 	const isInWishlist = userState?.wishlistIds?.includes(id as string);
@@ -38,6 +41,12 @@ const Details = () => {
 	const [isAddedtoWishlist, setIsAddedtoWishlist] = useState(isInWishlist);
 
 	const handleAddOrRemoveWishlistId = () => {
+		if (!userState) {
+			return navigate(
+				`/login?redirect=${location.pathname}${location.search}`,
+				{ state: { redirect: location }, replace: true }
+			);
+		}
 		const res = axiosPrivate.post(`/user/wishlist/${product?._id}`);
 		toast.promise(res, {
 			loading: "Adding to wishlist...",
@@ -60,6 +69,12 @@ const Details = () => {
 	};
 
 	const handleAddToCart = () => {
+		if (!userState) {
+			return navigate(
+				`/login?redirect=${location.pathname}${location.search}`,
+				{ state: { redirect: location }, replace: true }
+			);
+		}
 		const formData = new FormData();
 		formData.append("quantity", `${quantity}`);
 		setIsLoadingCart(true);
@@ -202,9 +217,11 @@ const Details = () => {
 											.split(".")[0]
 									}
 								</span>
-								<span className="inline-block px-2 py-1 absolute right-0 top-0 translate-x-[150%] bg-blue-700/20 text-xs text-blue-900">
-									{product.discount}%
-								</span>
+								{product.discount > 0 && (
+									<span className="inline-block px-2 py-1 absolute right-0 top-0 translate-x-[150%] bg-blue/20 text-xs text-blue">
+										{product.discount}%
+									</span>
+								)}
 							</div>
 							<div className="flex items-center gap-6 mb-6">
 								{product.category && (

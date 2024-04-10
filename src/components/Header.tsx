@@ -7,7 +7,7 @@ import { FaCartShopping } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
 import { UserContextType } from "../context/UserContext";
 import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
 const activeLink = ({ isActive }: { isActive: boolean }) => {
 	return `text-sm font-medium transition-colors hover:text-primary ${
@@ -15,11 +15,22 @@ const activeLink = ({ isActive }: { isActive: boolean }) => {
 	}`;
 };
 
+interface ISearch {
+	searchQuery: string;
+}
+
 const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const { userState } = useUserContext() as UserContextType;
 	const navigate = useNavigate();
-	const methods = useForm();
+	const methods = useForm<ISearch>();
+
+	const onSubmit: SubmitHandler<ISearch> = (formData: ISearch) => {
+		if (!formData.searchQuery) return;
+		console.log(formData);
+		navigate(`/products?search=${formData.searchQuery}`);
+	};
+
 	return (
 		<header className="w-full border-b py-3 sticky top-0 left-0 z-[99] bg-background">
 			<div className="w-full max-w-[1400px] mx-auto flex items-center justify-between">
@@ -36,22 +47,34 @@ const Header = () => {
 					<NavLink to="/products" className={activeLink}>
 						Products
 					</NavLink>
+					<NavLink to="/myProfile/wishlist" className={activeLink}>
+						Wishlist
+					</NavLink>
 				</nav>
 				<div className="flex items-center gap-4">
-					<div className="flex items-center gap-2 w-[35rem]">
+					<div className="w-[35rem]">
 						<FormProvider {...methods}>
-							<Input
-								id="search"
-								name="search"
-								autoComplete="on"
-								type="text"
-								placeholder="Search here..."
-							/>
+							<form
+								className="w-full flex items-center gap-2"
+								onSubmit={methods.handleSubmit(onSubmit)}
+							>
+								<Input
+									id="searchQuery"
+									name="searchQuery"
+									autoComplete="on"
+									type="text"
+									placeholder="Search here..."
+								/>
+								<Button
+									size="default"
+									varient="default"
+									type="submit"
+								>
+									<IoSearch className="mr-2" />
+									Search
+								</Button>
+							</form>
 						</FormProvider>
-						<Button size="default" varient="default">
-							<IoSearch className="mr-2" />
-							Search
-						</Button>
 					</div>
 					<Button
 						size="default"

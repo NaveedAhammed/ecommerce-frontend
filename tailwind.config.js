@@ -23,6 +23,11 @@ export default {
 				instagram: "#D52D85",
 				twitter: "#1DA1F1",
 				linkedin: "#0077B5",
+				blue: "hsl(202 96.7% 47.1%)",
+			},
+			boxShadow: {
+				inputHover: "rgb(232, 237, 235) 0px 0px 0px 3px",
+				inputFocus: "rgb(4, 152, 236) 0px 0px 0px 3px",
 			},
 		},
 		fontFamily: {

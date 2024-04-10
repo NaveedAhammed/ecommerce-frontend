@@ -6,6 +6,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Loader from "../components/Loader";
 import { IProduct } from "../types";
 import { errorHandler } from "../utils/errorHandler";
+import { useNavigate } from "react-router-dom";
 
 export type CartItemType = {
 	_id: string;
@@ -17,6 +18,8 @@ const Cart = () => {
 	const [cart, setCart] = useState<CartItemType[]>([]);
 	const axiosPrivate = useAxiosPrivate();
 	const [isLoading, setIsLoading] = useState(false);
+
+	const navigate = useNavigate();
 
 	const totalAmount = cart
 		.map((item) => item.productId.price * item.quantity)
@@ -55,6 +58,10 @@ const Cart = () => {
 			</div>
 		);
 	}
+
+	const handleCheckout = () => {
+		navigate("/checkout");
+	};
 
 	return (
 		<div className="w-full flex gap-12 py-4 relative">
@@ -132,8 +139,13 @@ const Cart = () => {
 					</div>
 				</div>
 				<div className="p-4 w-full">
-					<Button varient="default" size="lg" className="w-full">
-						Place Order
+					<Button
+						varient="default"
+						size="lg"
+						className="w-full"
+						onClick={handleCheckout}
+					>
+						Checkout
 					</Button>
 				</div>
 			</div>

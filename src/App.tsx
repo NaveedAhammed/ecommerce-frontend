@@ -19,6 +19,7 @@ const Orders = lazy(() => import("./pages/Orders"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Info = lazy(() => import("./pages/Info"));
 const ManageAddresses = lazy(() => import("./pages/ManageAddresses"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 
 const router = createBrowserRouter([
 	{
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
 							{
 								path: "cart",
 								element: <Cart />,
+							},
+							{
+								path: "checkout",
+								element: <Checkout />,
 							},
 							{
 								path: "myProfile",

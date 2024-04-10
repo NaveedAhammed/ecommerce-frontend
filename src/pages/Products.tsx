@@ -7,6 +7,8 @@ import { useSearchParams } from "react-router-dom";
 import publicAxios from "../utils/axios";
 import { IChildCategory, IParentCategory, IProduct } from "../types";
 import ProductItem from "../components/ProductItem";
+import { errorHandler } from "../utils/errorHandler";
+import Loader from "../components/Loader";
 
 const minDistance = 1000;
 
@@ -14,17 +16,20 @@ const Products = () => {
 	const [price, setPrice] = useState([0, 10000]);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([]);
+	const [brands, setBrands] = useState<string[]>([]);
 	const [parentCategories, setParentCategories] = useState<IParentCategory[]>(
 		[]
 	);
 	const [childCategories, setChildCategories] = useState<IChildCategory[]>(
 		[]
 	);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const parentCategoryParam = searchParams.get("parentCategory");
 	const brandsParam = searchParams.get("brands");
 	const childCategoryParam = searchParams.get("childCategory");
 	const searchParam = searchParams.get("search");
+	const discountParam = searchParams.get("discount");
 
 	const handlePriceChange = (
 		_: Event,
@@ -44,7 +49,6 @@ const Products = () => {
 
 	const updateSearchParams = (key: string, value: string) => {
 		const newSearchParams = new URLSearchParams(searchParams);
-		console.log(value);
 		if (!value || value === "[]") {
 			newSearchParams.delete(key);
 		} else {
@@ -54,10 +58,8 @@ const Products = () => {
 	};
 
 	const handleBrandAddition = (brand: string) => {
-		const brands = searchParams.get("brands");
-		console.log(brands);
-		if (brands) {
-			const newBrands = JSON.parse(brands) as Array<string>;
+		if (brandsParam) {
+			const newBrands = JSON.parse(brandsParam) as Array<string>;
 			const index = newBrands.indexOf(brand);
 			if (index !== -1) {
 				newBrands.splice(index, 1);
@@ -70,11 +72,27 @@ const Products = () => {
 		}
 	};
 
+	const handleDiscountAddition = (discount: string) => {
+		console.log(discount, discountParam);
+		if (discountParam && discount === discountParam) {
+			return updateSearchParams("discount", "");
+		}
+		return updateSearchParams("discount", discount);
+	};
+
 	const handleCategoriesClear = () => {
 		const newSearchParams = new URLSearchParams(searchParams);
 		newSearchParams.delete("childCategory");
 		newSearchParams.delete("parentCategory");
+		newSearchParams.delete("brands");
 		setChildCategories([]);
+		setSearchParams(newSearchParams);
+	};
+
+	const handleCategoryChange = (childCategory: string) => {
+		const newSearchParams = new URLSearchParams(searchParams);
+		newSearchParams.set("childCategory", childCategory);
+		newSearchParams.delete("brands");
 		setSearchParams(newSearchParams);
 	};
 
@@ -92,20 +110,52 @@ const Products = () => {
 		return childCategory ? childCategory._id : null;
 	}, [childCategories, childCategoryParam]);
 
+	const handleBrandChecked = (brand: string): boolean => {
+		if (brandsParam) {
+			const parsed = JSON.parse(brandsParam);
+			return parsed.includes(brand);
+		}
+		return false;
+	};
+
+	const handleDiscountChecked = (discount: string) => {
+		if (discountParam) {
+			return discount === discountParam;
+		}
+		return false;
+	};
+
 	useEffect(() => {
 		const getProducts = () => {
+			setIsLoading(true);
 			const parentCaregoryId = getParentCategoryId || "";
 			const childCaregoryId = getChildCategoryId || "";
 			const url = `/filteredProducts?search=${
 				searchParam ? searchParam : ""
-			}&parentCategoryId=${parentCaregoryId}&childCategoryId=${childCaregoryId}`;
-			publicAxios.get(url).then((res) => {
-				setFilteredProducts(res.data.data.filteredProducts);
-			});
+			}&parentCategoryId=${parentCaregoryId}&childCategoryId=${childCaregoryId}&brands=${brandsParam}&discount=${
+				discountParam ? discountParam : 0
+			}`;
+			console.log(parentCaregoryId, childCaregoryId, url);
+			publicAxios
+				.get(url)
+				.then((res) => {
+					setFilteredProducts(res.data.data.filteredProducts);
+					setBrands(res.data.data.brands);
+				})
+				.catch(errorHandler)
+				.finally(() => {
+					setIsLoading(false);
+				});
 		};
 
 		getProducts();
-	}, [getChildCategoryId, getParentCategoryId, searchParam]);
+	}, [
+		getChildCategoryId,
+		getParentCategoryId,
+		searchParam,
+		brandsParam,
+		discountParam,
+	]);
 
 	useEffect(() => {
 		const getParentCategories = () => {
@@ -119,11 +169,9 @@ const Products = () => {
 
 	useEffect(() => {
 		const getChildCategories = () => {
-			console.log("Hello");
 			const item = parentCategories.find(
 				(item) => item.name === parentCategoryParam
 			);
-			console.log(item);
 			publicAxios
 				.get(`/category/child/public/${item?._id}`)
 				.then((res) => {
@@ -140,41 +188,69 @@ const Products = () => {
 				<div className="flex flex-col items-center gap-4 w-full p-4 border-b">
 					<div className="w-full flex items-center justify-between">
 						<span className="text-lg">Filters</span>
-						<Button varient="link" size="default" className="pr-0">
-							Clear All
-						</Button>
+						{(parentCategoryParam ||
+							childCategoryParam ||
+							brandsParam) && (
+							<Button
+								varient="link"
+								size="default"
+								className="pr-0"
+							>
+								Clear All
+							</Button>
+						)}
 					</div>
 					<div className="flex w-full flex-wrap gap-2">
-						<Button
-							varient="default"
-							size="icon"
-							className="rounded-full gap-2 w-fit px-4 text-xs hover:line-through"
-						>
-							<span className="pr-3 border-r border-r-white">
-								Men
-							</span>
-							<RxCross2 />
-						</Button>
-						<Button
-							varient="default"
-							size="icon"
-							className="rounded-full gap-2 w-fit px-4 text-xs"
-						>
-							<span className="pr-3 border-r border-r-white">
-								Women
-							</span>
-							<RxCross2 />
-						</Button>
-						<Button
-							varient="default"
-							size="icon"
-							className="rounded-full gap-2 w-fit px-4 text-xs"
-						>
-							<span className="pr-3 border-r border-r-white">
-								Groceries
-							</span>
-							<RxCross2 />
-						</Button>
+						{parentCategoryParam && (
+							<div
+								className="flex h-fit py-2 rounded-md cursor-pointer items-center px-4 bg-secondaryForeground text-white gap-2 w-fit text-xs hover:line-through"
+								onClick={handleCategoriesClear}
+							>
+								<span className="pr-2 border-r border-r-white">
+									{parentCategoryParam}
+								</span>
+								<RxCross2 />
+							</div>
+						)}
+						{childCategoryParam && (
+							<div
+								className="flex h-fit py-2 rounded-md cursor-pointer items-center px-4 bg-secondaryForeground text-white gap-2 w-fit text-xs hover:line-through"
+								onClick={() =>
+									updateSearchParams("childCategory", "")
+								}
+							>
+								<span className="pr-2 border-r border-r-white">
+									{childCategoryParam}
+								</span>
+								<RxCross2 />
+							</div>
+						)}
+						{brandsParam &&
+							JSON.parse(brandsParam).map((it: string) => (
+								<div
+									className="flex h-fit py-2 rounded-md cursor-pointer items-center px-4 bg-secondaryForeground text-white gap-2 w-fit text-xs hover:line-through"
+									onClick={() => handleBrandAddition(it)}
+									key={it}
+								>
+									<span className="pr-2 border-r border-r-white">
+										{it}
+									</span>
+									<RxCross2 />
+								</div>
+							))}
+						{discountParam && (
+							<div
+								className="flex h-fit py-2 rounded-md cursor-pointer items-center px-4 bg-secondaryForeground text-white gap-2 w-fit text-xs hover:line-through"
+								onClick={() =>
+									updateSearchParams("discount", "")
+								}
+							>
+								<span className="pr-2 border-r border-r-white">
+									{discountParam}% or more
+								</span>
+								<RxCross2 />
+							</div>
+						)}
 					</div>
 				</div>
 				<nav className="flex flex-col py-3">
@@ -183,7 +259,7 @@ const Products = () => {
 							<span className="text-xs font-semibold text-mutedForeground uppercase">
 								Categories
 							</span>
-							{childCategoryParam && (
+							{parentCategoryParam && (
 								<Button
 									varient="link"
 									size="default"
@@ -252,9 +328,8 @@ const Products = () => {
 																	childCategory._id
 																}
 																onClick={() =>
-																	updateSearchParams(
-																		"childCategory",
-																		`${childCategory.name}`
+																	handleCategoryChange(
+																		childCategory.name
 																	)
 																}
 															>
@@ -297,67 +372,50 @@ const Products = () => {
 							}}
 						/>
 					</div>
-					<div className="px-4 py-2 flex flex-col border-b pb-4">
-						<div className="flex items-center justify-between h-10">
-							<span className="text-xs font-semibold text-mutedForeground uppercase">
-								Brand
-							</span>
-							{brandsParam && (
-								<Button
-									varient="link"
-									size="default"
-									className="pr-0 text-xs"
-									onClick={() =>
-										updateSearchParams("brands", "")
-									}
-								>
-									Clear
-								</Button>
-							)}
-						</div>
-						<div className="flex flex-col gap-2 text-sm">
-							<div className="flex items-center gap-2 w-full">
-								<input
-									type="checkbox"
-									id="ponds"
-									onChange={() =>
-										handleBrandAddition("ponds")
-									}
-								/>
-								<label
-									htmlFor="ponds"
-									className="cursor-pointer"
-								>
-									Pond's
-								</label>
+					{brands.length > 0 && (
+						<div className="px-4 py-2 flex flex-col border-b pb-4">
+							<div className="flex items-center justify-between h-10">
+								<span className="text-xs font-semibold text-mutedForeground uppercase">
+									Brand
+								</span>
+								{brandsParam && (
+									<Button
+										varient="link"
+										size="default"
+										className="pr-0 text-xs"
+										onClick={() =>
+											updateSearchParams("brands", "")
+										}
+									>
+										Clear
+									</Button>
+								)}
 							</div>
-							<div className="flex items-center gap-2 w-full">
-								<input
-									type="checkbox"
-									onChange={() =>
-										handleBrandAddition("apple")
-									}
-								/>
-								<span>Apple</span>
-							</div>
-							<div className="flex items-center gap-2 w-full">
-								<input
-									type="checkbox"
-									onChange={() =>
-										handleBrandAddition("samsung")
-									}
-								/>
-								<span>Samsung</span>
-							</div>
-							<div className="flex items-center gap-2 w-full">
-								<input
-									type="checkbox"
-									onChange={() => handleBrandAddition("acer")}
-								/>
-								<span>Acer</span>
+							<div className="flex flex-col gap-2 text-sm">
+								{brands.map((brand) => (
+									<div
+										className="flex items-center gap-2 w-full"
+										key={brand}
+									>
+										<input
+											type="checkbox"
+											id={brand}
+											onChange={() => {
+												handleBrandAddition(brand);
+											}}
+											checked={handleBrandChecked(brand)}
+										/>
+										<label
+											htmlFor={brand}
+											className="cursor-pointer"
+										>
+											{brand}
+										</label>
+									</div>
+								))}
 							</div>
 						</div>
-					</div>
+					)}
 					<div className="px-4 py-2 flex flex-col gap-2 border-b pb-4">
 						<div className="flex items-center justify-between">
 							<span className="text-xs font-semibold text-mutedForeground uppercase">
@@ -373,8 +431,8 @@ const Products = () => {
 						</div>
 						<div className="flex flex-col gap-2 text-sm">
 							<div className="flex items-center gap-2 w-full">
-								<input type="checkbox" />
-								<span>4&#9733; & above</span>
+								<input type="checkbox" id="5" />
+								<label htmlFor="5">4&#9733; & above</label>
 							</div>
 							<div className="flex items-center gap-2 w-full">
 								<input type="checkbox" />
@@ -387,36 +445,76 @@ const Products = () => {
 						</div>
 					</div>
 					<div className="px-4 py-2 flex flex-col gap-2 border-b pb-4">
-						<div className="flex items-center justify-between">
+						<div className="flex items-center justify-between h-10">
 							<span className="text-xs font-semibold text-mutedForeground uppercase">
 								Discount
 							</span>
-							<Button
-								varient="link"
-								size="default"
-								className="pr-0 text-xs"
-							>
-								Clear
-							</Button>
+							{discountParam && (
+								<Button
+									varient="link"
+									size="default"
+									className="pr-0 text-xs"
+									onClick={() =>
+										updateSearchParams("discount", "")
+									}
+								>
+									Clear
+								</Button>
+							)}
 						</div>
 						<div className="flex flex-col gap-2 text-sm">
 							<div className="flex items-center gap-2 w-full">
-								<input type="checkbox" />
-								<span>50% or more</span>
+								<input
+									type="radio"
+									id="50"
+									name="discount"
+									onChange={() =>
+										handleDiscountAddition("50")
+									}
+									checked={handleDiscountChecked("50")}
+								/>
+								<label htmlFor="50" className="cursor-pointer">
+									50% or more
+								</label>
 							</div>
 							<div className="flex items-center gap-2 w-full">
-								<input type="checkbox" />
-								<span>40% or more</span>
+								<input
+									type="radio"
+									name="discount"
+									id="40"
+									onChange={() =>
+										handleDiscountAddition("40")
+									}
+									checked={handleDiscountChecked("40")}
+								/>
+								<label htmlFor="40" className="cursor-pointer">
+									40% or more
+								</label>
 							</div>
 							<div className="flex items-center gap-2 w-full">
-								<input type="checkbox" />
-								<span>30% or more</span>
+								<input
+									id="30"
+									type="radio"
+									name="discount"
+									onChange={() =>
+										handleDiscountAddition("30")
+									}
+									checked={handleDiscountChecked("30")}
+								/>
+								<label htmlFor="30" className="cursor-pointer">
+									30% or more
+								</label>
 							</div>
 						</div>
 					</div>
 				</nav>
 			</div>
-			<div className="w-[80%] grid grid-cols-5 h-fit gap-y-6">
+			<div className="w-[80%] grid grid-cols-5 h-fit gap-y-6 relative">
+				{isLoading && (
+					<div className="w-full min-h-[80vh] bg-white/70 z-[5] flex items-center justify-center absolute top-0 left-0">
+						<Loader color="black" height="3rem" width="3rem" />
+					</div>
+				)}
 				{filteredProducts.length > 0 &&
 					filteredProducts.map((product) => (
 						<ProductItem
@@ -425,6 +523,20 @@ const Products = () => {
 							className="border-0 shadow-none"
 						/>
 					))}
+				<div className="w-full col-span-5 flex items-center p-4 justify-center gap-3">
+					<Button
+						varient="outline"
+						size="lg"
+						onClick={() => {}}
+						disabled
+					>
+						Previous
+					</Button>
+					<span>1</span>
+					<Button varient="outline" size="lg" onClick={() => {}}>
+						Next
+					</Button>
+				</div>
 			</div>
 		</div>
 	);

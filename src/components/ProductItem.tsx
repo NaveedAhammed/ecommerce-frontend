@@ -34,6 +34,12 @@ const ProductItem: React.FC<{
 	const axiosPrivate = useAxiosPrivate();
 
 	const handleAddOrRemoveWishlistId = () => {
+		if (!userState) {
+			return navigate(
+				`/login?redirect=${location.pathname}${location.search}`,
+				{ state: { redirect: location }, replace: true }
+			);
+		}
 		const res = axiosPrivate.post(`/user/wishlist/${product?._id}`);
 		toast.promise(res, {
 			loading: "Adding to wishlist...",
@@ -62,9 +68,10 @@ const ProductItem: React.FC<{
 
 	const handleAddToCart = () => {
 		if (!userState) {
-			return navigate(`/login?redirect=${location.pathname}`, {
-				state: { redirect: location },
-			});
+			return navigate(
+				`/login?redirect=${location.pathname}${location.search}`,
+				{ state: { redirect: location }, replace: true }
+			);
 		}
 		const formData = new FormData();
 		formData.append("quantity", "1");
@@ -149,7 +156,7 @@ const ProductItem: React.FC<{
 						{product?.category?.name}
 					</span>
 					{product.discount > 0 && (
-						<span className="bg-blue-700/20 text-[10px] text-blue-900 px-[6px] py-[2px] rounded-md">
+						<span className="bg-blue/20 text-[10px] text-blue px-[6px] py-[2px] rounded-md">
 							{product.discount}%
 						</span>
 					)}
@@ -183,11 +190,13 @@ const ProductItem: React.FC<{
 								{product.unit?.shortHand}
 							</span>
 						)}
-						{product.unit?.value && !product?.unit?.shortHand && (
-							<span className="text-xs">
-								{product.unit?.value}
-							</span>
-						)}
+						{product.unit?.value &&
+							product?.unit.name !== "Dimensions" &&
+							!product?.unit?.shortHand && (
+								<span className="text-xs">
+									{product.unit?.value}
+								</span>
+							)}
 						{product?.color && (
 							<div
 								className={`w-4 h-4 rounded-full border`}

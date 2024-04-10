@@ -186,7 +186,6 @@ const Checkout = () => {
 	};
 
 	const handleMakePayment = async () => {
-		console.log(selectedAddress);
 		const stripe: Stripe | null = await loadStripe(
 			import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 		);
@@ -194,7 +193,6 @@ const Checkout = () => {
 			selectedAddress,
 			cart,
 		});
-		console.log(res.data);
 		await stripe?.redirectToCheckout({
 			sessionId: res.data.data.sessionId,
 		});

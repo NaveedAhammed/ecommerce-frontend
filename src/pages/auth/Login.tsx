@@ -80,7 +80,6 @@ const Login = () => {
 		if (userState) {
 			if (locationState) {
 				const { redirect } = locationState;
-				console.log(redirect);
 				return navigate(`${redirect.pathname}${redirect.search}`);
 			}
 			navigate("/");

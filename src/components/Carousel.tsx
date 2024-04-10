@@ -12,7 +12,6 @@ const Carousel: React.FC<{ products: IProduct[] }> = ({ products }) => {
 		if (sliderRef?.current) {
 			const slideAmount =
 				sliderRef.current.getBoundingClientRect().x - 20;
-			console.log(slideAmount);
 			if (dir === "left") {
 				sliderRef.current.style.transform = `translateX(${
 					236.66 + slideAmount

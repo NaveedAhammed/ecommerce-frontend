@@ -94,7 +94,6 @@ const ManageAddresses = () => {
 			) {
 				methods.setValue(name, value);
 			}
-			console.log(name, value);
 			setIsEditing(true);
 			setIsFormOpen(true);
 			setId(shippingInfo?._id);
@@ -187,7 +186,6 @@ const ManageAddresses = () => {
 		toast.promise(res, {
 			loading: "Deleting the address...",
 			success: (res) => {
-				console.log(res.data);
 				setUserState((prev) => {
 					if (prev) {
 						const updatedUserState = {

@@ -27,7 +27,6 @@ const Header = () => {
 
 	const onSubmit: SubmitHandler<ISearch> = (formData: ISearch) => {
 		if (!formData.searchQuery) return;
-		console.log(formData);
 		navigate(`/products?search=${formData.searchQuery}`);
 	};
 

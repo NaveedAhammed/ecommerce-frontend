@@ -73,7 +73,6 @@ const Products = () => {
 	};
 
 	const handleDiscountAddition = (discount: string) => {
-		console.log(discount, discountParam);
 		if (discountParam && discount === discountParam) {
 			return updateSearchParams("discount", "");
 		}
@@ -138,7 +137,6 @@ const Products = () => {
 			}&parentCategoryId=${parentCaregoryId}&childCategoryId=${childCaregoryId}&brands=${brandsParam}&discount=${
 				discountParam ? discountParam : 0
 			}`;
-			console.log(parentCaregoryId, childCaregoryId, url);
 			publicAxios
 				.get(url, { signal: controller.signal })
 				.then((res) => {

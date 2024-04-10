@@ -9,7 +9,6 @@ const useRefreshToken = () => {
 	const refresh = async () => {
 		try {
 			const res = (await privateAxios.get("/refresh")).data;
-			console.log(res);
 			const { user: userData, accessToken } = res.data;
 			setUserState({
 				username: userData.username,
@@ -25,7 +24,6 @@ const useRefreshToken = () => {
 			});
 			return res.data.accessToken;
 		} catch (err) {
-			console.log(err);
 			const error = err as AxiosError;
 			if (error?.response?.status === 401) {
 				setUserState(null);

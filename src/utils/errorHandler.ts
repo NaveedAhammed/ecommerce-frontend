@@ -8,15 +8,8 @@ export const errorHandler = (err: unknown) => {
 		if (err.code === "ERR_NETWORK") {
 			console.log("connection problems..");
 			toast.error("Network connection problem...");
-		} else if (err.code === "ERR_CANCELED") {
-			console.log("connection canceled..");
-			toast.error("connection canceled..");
 		} else if (err.code === "ERR_BAD_RESPONSE") {
 			toast.error("Something went wrong");
-		} else if (!err?.response) {
-			toast.error("Something went wrong");
-		} else {
-			toast.error(err.response?.data?.message);
 		}
 	}
 };

@@ -3,7 +3,7 @@ import Button from "../components/Button";
 import { RxCross2 } from "react-icons/rx";
 import { useEffect, useMemo, useState } from "react";
 import { IoIosArrowForward, IoIosArrowDown } from "react-icons/io";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import publicAxios from "../utils/axios";
 import { IChildCategory, IParentCategory, IProduct } from "../types";
 import ProductItem from "../components/ProductItem";
@@ -24,7 +24,7 @@ const Products = () => {
 		[]
 	);
 	const [isLoading, setIsLoading] = useState(false);
-
+	const navigate = useNavigate();
 	const parentCategoryParam = searchParams.get("parentCategory");
 	const brandsParam = searchParams.get("brands");
 	const childCategoryParam = searchParams.get("childCategory");
@@ -126,6 +126,9 @@ const Products = () => {
 	};
 
 	useEffect(() => {
+		let isMounted = true;
+		const controller = new AbortController();
+
 		const getProducts = () => {
 			setIsLoading(true);
 			const parentCaregoryId = getParentCategoryId || "";
@@ -137,10 +140,11 @@ const Products = () => {
 			}`;
 			console.log(parentCaregoryId, childCaregoryId, url);
 			publicAxios
-				.get(url)
+				.get(url, { signal: controller.signal })
 				.then((res) => {
-					setFilteredProducts(res.data.data.filteredProducts);
-					setBrands(res.data.data.brands);
+					isMounted &&
+						setFilteredProducts(res.data.data.filteredProducts);
+					isMounted && setBrands(res.data.data.brands);
 				})
 				.catch(errorHandler)
 				.finally(() => {
@@ -149,6 +153,11 @@ const Products = () => {
 		};
 
 		getProducts();
+
+		return () => {
+			isMounted = false;
+			controller.abort();
+		};
 	}, [
 		getChildCategoryId,
 		getParentCategoryId,
@@ -195,6 +204,7 @@ const Products = () => {
 								varient="link"
 								size="default"
 								className="pr-0"
+								onClick={() => navigate("/products")}
 							>
 								Clear All
 							</Button>
@@ -511,7 +521,7 @@ const Products = () => {
 			</div>
 			<div className="w-[80%] grid grid-cols-5 h-fit gap-y-6 relative">
 				{isLoading && (
-					<div className="w-full min-h-[80vh] bg-white/70 z-[5] flex items-center justify-center absolute top-0 left-0">
+					<div className="w-full min-h-[80vh] h-full bg-white/70 z-[5] flex items-center justify-center absolute top-0 left-0">
 						<Loader color="black" height="3rem" width="3rem" />
 					</div>
 				)}

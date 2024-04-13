@@ -125,7 +125,7 @@ const CartItem: React.FC<{
 							}
 						</span>
 						{product.discount > 0 && (
-							<span className="bg-blue-700/20 text-[10px] text-blue-900 px-[6px] py-[2px] rounded-md">
+							<span className="bg-blue/20 text-[10px] text-blue px-[6px] py-[2px] rounded-md">
 								{product.discount}%
 							</span>
 						)}

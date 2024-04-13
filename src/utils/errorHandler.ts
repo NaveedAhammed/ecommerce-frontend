@@ -10,6 +10,10 @@ export const errorHandler = (err: unknown) => {
 			toast.error("Network connection problem...");
 		} else if (err.code === "ERR_BAD_RESPONSE") {
 			toast.error("Something went wrong");
+		} else if (!err?.response) {
+			toast.error("Something went wrong");
+		} else {
+			toast.error(err.response?.data.message);
 		}
 	}
 };

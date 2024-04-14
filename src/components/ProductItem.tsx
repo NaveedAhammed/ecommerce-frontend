@@ -73,6 +73,9 @@ const ProductItem: React.FC<{
 				{ state: { redirect: location }, replace: true }
 			);
 		}
+		if (product.stock === 0) {
+			return toast.error("Product you are trying to add is out of stock");
+		}
 		const formData = new FormData();
 		formData.append("quantity", "1");
 		const res = axiosPrivate.post(`/user/cart/${product._id}`, formData);

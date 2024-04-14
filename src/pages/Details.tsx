@@ -1,7 +1,6 @@
 import Button from "../components/Button";
 import { IProduct } from "../types";
 import { PiHeartDuotone, PiHeartFill } from "react-icons/pi";
-import { FaPlus, FaMinus } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { FaCartShopping } from "react-icons/fa6";
 import Heading from "../components/Heading";
@@ -17,9 +16,10 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import toast from "react-hot-toast";
 import { errorHandler } from "../utils/errorHandler";
 import axios from "axios";
+import { TiStar } from "react-icons/ti";
+import ReviewItem from "../components/ReviewItem";
 
 const Details = () => {
-	const [quantity, setQuantity] = useState(1);
 	const [index, setIndex] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isLoadingCart, setIsLoadingCart] = useState(false);
@@ -37,6 +37,9 @@ const Details = () => {
 	const { id } = useParams();
 
 	const isInWishlist = userState?.wishlistIds?.includes(id as string);
+	const isInCart = userState?.cart
+		?.map((it) => it.productId)
+		.includes(id as string);
 
 	const [isAddedtoWishlist, setIsAddedtoWishlist] = useState(isInWishlist);
 
@@ -76,7 +79,7 @@ const Details = () => {
 			);
 		}
 		const formData = new FormData();
-		formData.append("quantity", `${quantity}`);
+		formData.append("quantity", "1");
 		setIsLoadingCart(true);
 		axiosPrivate
 			.post(`/user/cart/add/${product?._id}`, formData)
@@ -92,7 +95,7 @@ const Details = () => {
 					}
 					return null;
 				});
-				return toast.success(res.data.message);
+				return navigate("/cart");
 			})
 			.catch(errorHandler)
 			.finally(() => {
@@ -223,6 +226,17 @@ const Details = () => {
 									</span>
 								)}
 							</div>
+							{product.reviews.length > 0 && (
+								<div className="flex items-center gap-2 mb-6">
+									<div className="bg-green-700 text-sm font-bold text-white flex items-center px-2 rounded-md py-1">
+										<span>{product.numRating}</span>
+										<TiStar size={16} />
+									</div>
+									<span className="text-mutedForeground cursor-pointer hover:text-secondaryForeground">
+										({product.reviews.length} Reviews)
+									</span>
+								</div>
+							)}
 							<div className="flex items-center gap-6 mb-6">
 								{product.category && (
 									<div className="flex items-center gap-2">
@@ -285,51 +299,39 @@ const Details = () => {
 									? "Out of Stock"
 									: "Few Left"}
 							</span>
-							<div className="flex items-center gap-3 mb-6">
+							{!isInCart && (
 								<Button
-									varient="outline"
-									size="icon"
-									onClick={() =>
-										setQuantity((prev) => prev - 1)
-									}
-									disabled={quantity === 1}
+									varient="default"
+									size="default"
+									className="w-fit gap-2"
+									disabled={product.stock === 0}
+									onClick={handleAddToCart}
 								>
-									<FaMinus />
-								</Button>
-								<span>{quantity}</span>
-								<Button
-									varient="outline"
-									size="icon"
-									onClick={() =>
-										setQuantity((prev) => prev + 1)
-									}
-									disabled={
-										quantity >= Math.min(product.stock, 6)
-									}
-								>
-									<FaPlus />
-								</Button>
-							</div>
-							<Button
-								varient="default"
-								size="default"
-								className="w-fit gap-2"
-								disabled={product.stock === 0}
-								onClick={handleAddToCart}
-							>
-								{isLoadingCart && (
-									<Loader
-										width="1rem"
-										height="1rem"
-										color="white"
-									/>
-								)}
-								{isLoadingCart
-									? "Adding to Cart..."
-									: "Add to Cart"}
+									{isLoadingCart && (
+										<Loader
+											width="1rem"
+											height="1rem"
+											color="white"
+										/>
+									)}
+									{isLoadingCart
+										? "Going to Cart..."
+										: "Add to Cart"}
 
-								<FaCartShopping />
-							</Button>
+									<FaCartShopping />
+								</Button>
+							)}
+							{isInCart && (
+								<Button
+									varient="default"
+									size="default"
+									className="w-fit gap-2"
+									onClick={() => navigate("/cart")}
+								>
+									<span>Go to Cart</span>
+									<FaCartShopping />
+								</Button>
+							)}
 						</div>
 					</div>
 					{similarProducts.length > 0 && (
@@ -342,6 +344,37 @@ const Details = () => {
 							<Carousel products={similarProducts} />
 						</>
 					)}
+					<div className="border py-4">
+						<div className="flex items-center justify-between p-4 border-b">
+							<span className="text-2xl font-medium">
+								Ratings & Reviews
+							</span>
+							<Button
+								varient="outline"
+								size="default"
+								onClick={() =>
+									navigate(
+										`/rate-review/product/${product._id}`
+									)
+								}
+							>
+								Rate Product
+							</Button>
+						</div>
+						{product.reviews.length > 0 && (
+							<div className="w-full flex flex-col">
+								{product.reviews.map((item, i) => (
+									<ReviewItem
+										item={item}
+										isLast={
+											i === product.reviews.length - 1
+										}
+										key={item.userId._id}
+									/>
+								))}
+							</div>
+						)}
+					</div>
 				</>
 			)}
 		</>

@@ -22,6 +22,7 @@ const Cart = lazy(() => import("./pages/Cart"));
 const Info = lazy(() => import("./pages/Info"));
 const ManageAddresses = lazy(() => import("./pages/ManageAddresses"));
 const Checkout = lazy(() => import("./pages/Checkout"));
+const RateReview = lazy(() => import("./components/RateReview"));
 
 const router = createBrowserRouter([
 	{
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
 							{
 								path: "checkout",
 								element: <Checkout />,
+							},
+							{
+								path: "/rate-review/product/:id",
+								element: <RateReview />,
 							},
 							{
 								path: "myProfile",

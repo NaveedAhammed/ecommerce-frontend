@@ -5,12 +5,15 @@ import HeroBanner from "../components/HeroBanner";
 import publicAxios from "../utils/axios";
 import Loader from "../components/Loader";
 import { errorHandler } from "../utils/errorHandler";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
 	const [billboard, setBillboard] = useState(null);
 	const [featuredProducts, setFeaturedProducts] = useState([]);
 	const [newArrivalProducts, setNewArrivalProducts] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
+
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const getHomePageData = async () => {
@@ -47,7 +50,7 @@ const Home = () => {
 			<>
 				<Heading
 					title="Featured"
-					action={() => {}}
+					action={() => navigate("/products?featured=true")}
 					actionLabel="Show more"
 				/>
 				<Carousel products={featuredProducts} />
@@ -55,7 +58,7 @@ const Home = () => {
 			<>
 				<Heading
 					title="New Arrivals"
-					action={() => {}}
+					action={() => navigate("/products?newArrivals=true")}
 					actionLabel="Show more"
 				/>
 				<Carousel products={newArrivalProducts} />

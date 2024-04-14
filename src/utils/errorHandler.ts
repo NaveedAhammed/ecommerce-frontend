@@ -6,14 +6,15 @@ export const errorHandler = (err: unknown) => {
 	if (axios.isAxiosError<{ message: string }>(err)) {
 		console.log(err.code);
 		if (err.code === "ERR_NETWORK") {
-			console.log("connection problems..");
-			toast.error("Network connection problem...");
-		} else if (err.code === "ERR_BAD_RESPONSE") {
-			toast.error("Something went wrong");
-		} else if (!err?.response) {
-			toast.error("Something went wrong");
-		} else {
-			toast.error(err.response?.data.message);
+			return toast.error("Network connection problem...");
+		} else if (err.code !== "ERR_CANCELED") {
+			if (err.code === "ERR_BAD_RESPONSE") {
+				return toast.error("Something went wrong");
+			} else if (!err?.response) {
+				toast.error("Something went wrong");
+			} else {
+				toast.error(err.response?.data.message);
+			}
 		}
 	}
 };

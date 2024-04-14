@@ -70,10 +70,10 @@ export interface IImage {
 }
 
 export interface IReview {
-	userId: string;
-	username: string;
+	userId: UserType;
 	numRating: number;
 	comment: string;
+	postedAt: string;
 }
 
 export interface IChildCategory {

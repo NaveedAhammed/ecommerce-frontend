@@ -8,6 +8,9 @@ import { IoSearch } from "react-icons/io5";
 import { UserContextType } from "../context/UserContext";
 import { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import toast from "react-hot-toast";
+import { errorHandler } from "../utils/errorHandler";
 
 const activeLink = ({ isActive }: { isActive: boolean }) => {
 	return `text-sm font-medium transition-colors hover:text-primary ${
@@ -21,13 +24,28 @@ interface ISearch {
 
 const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
-	const { userState } = useUserContext() as UserContextType;
+	const { userState, setUserState } = useUserContext() as UserContextType;
 	const navigate = useNavigate();
 	const methods = useForm<ISearch>();
+	const axiosPrivate = useAxiosPrivate();
 
 	const onSubmit: SubmitHandler<ISearch> = (formData: ISearch) => {
 		if (!formData.searchQuery) return;
 		navigate(`/products?search=${formData.searchQuery}`);
+	};
+
+	const handleLogout = () => {
+		axiosPrivate
+			.post("/logout")
+			.then((res) => {
+				if (!res.data.success) {
+					return toast.error(res.data.message);
+				}
+				setUserState(null);
+				localStorage.setItem("isLoggedIn", "false");
+				return toast.success(res.data.message);
+			})
+			.catch(errorHandler);
 	};
 
 	return (
@@ -133,7 +151,7 @@ const Header = () => {
 									</Link>
 									<div
 										className="py-2 px-4 hover:bg-secondary w-full text-start"
-										onClick={() => {}}
+										onClick={handleLogout}
 									>
 										Logout
 									</div>

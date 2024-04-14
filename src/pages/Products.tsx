@@ -13,8 +13,15 @@ import Loader from "../components/Loader";
 const minDistance = 1000;
 
 const Products = () => {
-	const [price, setPrice] = useState([0, 10000]);
 	const [searchParams, setSearchParams] = useSearchParams();
+
+	const minPriceParam = searchParams.get("minPrice")
+		? Number(searchParams.get("minPrice"))
+		: 0;
+	const maxPriceParam = searchParams.get("maxPrice")
+		? Number(searchParams.get("maxPrice"))
+		: 30000;
+	const [price, setPrice] = useState([minPriceParam, maxPriceParam]);
 	const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([]);
 	const [brands, setBrands] = useState<string[]>([]);
 	const [parentCategories, setParentCategories] = useState<IParentCategory[]>(
@@ -30,22 +37,8 @@ const Products = () => {
 	const childCategoryParam = searchParams.get("childCategory");
 	const searchParam = searchParams.get("search");
 	const discountParam = searchParams.get("discount");
-
-	const handlePriceChange = (
-		_: Event,
-		newValue: number | number[],
-		activeThumb: number
-	) => {
-		if (!Array.isArray(newValue)) {
-			return;
-		}
-
-		if (activeThumb === 0) {
-			setPrice([Math.min(newValue[0], price[1] - minDistance), price[1]]);
-		} else {
-			setPrice([price[0], Math.max(newValue[1], price[0] + minDistance)]);
-		}
-	};
+	const featured = searchParams.get("featured");
+	const newArrivals = searchParams.get("newArrivals");
 
 	const updateSearchParams = (key: string, value: string) => {
 		const newSearchParams = new URLSearchParams(searchParams);
@@ -117,11 +110,42 @@ const Products = () => {
 		return false;
 	};
 
+	const handlePriceChange = (
+		_: Event,
+		newValue: number | number[],
+		activeThumb: number
+	) => {
+		if (!Array.isArray(newValue)) {
+			return;
+		}
+		if (activeThumb === 0) {
+			const minPriceValue = Math.min(newValue[0], price[1] - minDistance);
+			setPrice([minPriceValue, price[1]]);
+			minPriceValue === 0
+				? updateSearchParams("minPrice", "")
+				: updateSearchParams("minPrice", `${minPriceValue}`);
+		} else {
+			const maxPriceValue = Math.max(newValue[1], price[0] + minDistance);
+			setPrice([price[0], maxPriceValue]);
+			maxPriceValue === 30000
+				? updateSearchParams("maxPrice", "")
+				: updateSearchParams("maxPrice", `${maxPriceValue}`);
+		}
+	};
+
 	const handleDiscountChecked = (discount: string) => {
 		if (discountParam) {
 			return discount === discountParam;
 		}
 		return false;
+	};
+
+	const handlePriceClear = () => {
+		setPrice([0, 30000]);
+		const newSearchParams = new URLSearchParams(searchParams);
+		newSearchParams.delete("minPrice");
+		newSearchParams.delete("maxPrice");
+		setSearchParams(newSearchParams);
 	};
 
 	useEffect(() => {
@@ -136,7 +160,7 @@ const Products = () => {
 				searchParam ? searchParam : ""
 			}&parentCategoryId=${parentCaregoryId}&childCategoryId=${childCaregoryId}&brands=${brandsParam}&discount=${
 				discountParam ? discountParam : 0
-			}`;
+			}&featured=${featured}&newArrivals=${newArrivals}&minPrice=${minPriceParam}&maxPrice=${maxPriceParam}`;
 			publicAxios
 				.get(url, { signal: controller.signal })
 				.then((res) => {
@@ -162,6 +186,10 @@ const Products = () => {
 		searchParam,
 		brandsParam,
 		discountParam,
+		newArrivals,
+		featured,
+		minPriceParam,
+		maxPriceParam,
 	]);
 
 	useEffect(() => {
@@ -233,6 +261,32 @@ const Products = () => {
 								<RxCross2 />
 							</div>
 						)}
+						{featured && (
+							<div
+								className="flex h-fit py-2 rounded-md cursor-pointer items-center px-4 bg-secondaryForeground text-white gap-2 w-fit text-xs hover:line-through"
+								onClick={() =>
+									updateSearchParams("featured", "")
+								}
+							>
+								<span className="pr-2 border-r border-r-white">
+									Featured
+								</span>
+								<RxCross2 />
+							</div>
+						)}
+						{newArrivals && (
+							<div
+								className="flex h-fit py-2 rounded-md cursor-pointer items-center px-4 bg-secondaryForeground text-white gap-2 w-fit text-xs hover:line-through"
+								onClick={() =>
+									updateSearchParams("newArrivals", "")
+								}
+							>
+								<span className="pr-2 border-r border-r-white">
+									New Arrivals
+								</span>
+								<RxCross2 />
+							</div>
+						)}
 						{brandsParam &&
 							JSON.parse(brandsParam).map((it: string) => (
 								<div
@@ -255,6 +309,34 @@ const Products = () => {
 							>
 								<span className="pr-2 border-r border-r-white">
 									{discountParam}% or more
+								</span>
+								<RxCross2 />
+							</div>
+						)}
+						{minPriceParam > 0 && (
+							<div
+								className="flex h-fit py-2 rounded-md cursor-pointer items-center px-4 bg-secondaryForeground text-white gap-2 w-fit text-xs hover:line-through"
+								onClick={() => {
+									updateSearchParams("minPrice", "");
+									setPrice((prev) => [0, prev[1]]);
+								}}
+							>
+								<span className="pr-2 border-r border-r-white">
+									Min Price: {minPriceParam}
+								</span>
+								<RxCross2 />
+							</div>
+						)}
+						{maxPriceParam < 30000 && (
+							<div
+								className="flex h-fit py-2 rounded-md cursor-pointer items-center px-4 bg-secondaryForeground text-white gap-2 w-fit text-xs hover:line-through"
+								onClick={() => {
+									updateSearchParams("maxPrice", "");
+									setPrice((prev) => [prev[0], 30000]);
+								}}
+							>
+								<span className="pr-2 border-r border-r-white">
+									Max Price: {maxPriceParam}
 								</span>
 								<RxCross2 />
 							</div>
@@ -354,17 +436,20 @@ const Products = () => {
 						</div>
 					</div>
 					<div className="px-4 flex flex-col gap-4 border-b pb-4">
-						<div className="flex items-center justify-between">
+						<div className="flex h-10 items-center justify-between">
 							<span className="text-xs font-semibold text-mutedForeground uppercase">
 								Price
 							</span>
-							<Button
-								varient="link"
-								size="default"
-								className="pr-0 text-xs"
-							>
-								Clear
-							</Button>
+							{(minPriceParam > 0 || maxPriceParam < 30000) && (
+								<Button
+									varient="link"
+									size="default"
+									className="pr-0 text-xs"
+									onClick={handlePriceClear}
+								>
+									Clear
+								</Button>
+							)}
 						</div>
 						<Slider
 							aria-labelledby="range-slider"
@@ -373,7 +458,7 @@ const Products = () => {
 							valueLabelDisplay="auto"
 							disableSwap
 							min={0}
-							max={10000}
+							max={30000}
 							step={100}
 							style={{
 								color: "hsl(215.4 16.3% 46.9%)",

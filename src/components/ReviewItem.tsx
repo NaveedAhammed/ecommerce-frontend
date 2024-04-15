@@ -1,7 +1,7 @@
 import { TiStar } from "react-icons/ti";
 import { IReview } from "../types";
 import { GoPerson } from "react-icons/go";
-import { getTimeAgo } from "../utils/getTimesAgo";
+import { formatDistance } from "date-fns";
 
 const ReviewItem: React.FC<{ item: IReview; isLast: boolean }> = ({
 	item,
@@ -29,7 +29,11 @@ const ReviewItem: React.FC<{ item: IReview; isLast: boolean }> = ({
 					{item.userId.username}
 				</span>
 				<span className="text-sm text-mutedForeground">
-					{getTimeAgo(item.postedAt)}
+					{formatDistance(
+						new Date(Date.now()),
+						new Date(item.postedAt)
+					)}{" "}
+					ago
 				</span>
 			</div>
 			<div className="flex gap-2">

@@ -4,6 +4,9 @@ import { NavLink, Outlet } from "react-router-dom";
 import useUserContext from "../hooks/useUserContext";
 import { UserContextType } from "../context/UserContext";
 import profile from "../assets/profile.webp";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const activeLink = ({ isActive }: { isActive: boolean }) => {
 	return `text-[14px] font-medium transition-colors hover:text-primary py-3 px-6 w-full ${
@@ -12,8 +15,32 @@ const activeLink = ({ isActive }: { isActive: boolean }) => {
 };
 
 const Profile = () => {
-	const { userState } = useUserContext() as UserContextType;
+	const { userState, setUserState } = useUserContext() as UserContextType;
 	const profilePicture = userState?.avatar ? userState.avatar : profile;
+
+	const axiosPrivate = useAxiosPrivate();
+
+	const handleLogout = () => {
+		const res = axiosPrivate.post("/logout");
+		toast.promise(res, {
+			loading: `Logging out...`,
+			success: () => {
+				setUserState(null);
+				localStorage.setItem("isLoggedIn", "false");
+				return "Logged out!";
+			},
+			error: (err) => {
+				if (axios.isAxiosError<{ message: string }>(err)) {
+					if (!err?.response) {
+						return "Something went wrong";
+					} else {
+						return `${err.response?.data?.message}`;
+					}
+				}
+				return "Unexpected error!";
+			},
+		});
+	};
 
 	return (
 		<div className="w-full max-w-[1400px] mx-auto h-full flex gap-10 relative py-2">
@@ -45,7 +72,10 @@ const Profile = () => {
 						My Wishlist
 					</NavLink>
 				</nav>
-				<div className="text-[14px] font-medium transition-colors hover:text-primary py-4 px-6 w-full cursor-pointer hover:bg-secondary mt-3">
+				<div
+					className="text-[14px] font-medium transition-colors hover:text-primary py-4 px-6 w-full cursor-pointer hover:bg-secondary mt-3"
+					onClick={handleLogout}
+				>
 					<span>Logout</span>
 				</div>
 			</div>

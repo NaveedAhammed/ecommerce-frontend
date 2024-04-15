@@ -6,11 +6,11 @@ import Input from "./Input";
 import { FaCartShopping } from "react-icons/fa6";
 import { IoSearch } from "react-icons/io5";
 import { UserContextType } from "../context/UserContext";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import toast from "react-hot-toast";
-import { errorHandler } from "../utils/errorHandler";
+import axios from "axios";
 
 const activeLink = ({ isActive }: { isActive: boolean }) => {
 	return `text-sm font-medium transition-colors hover:text-primary ${
@@ -29,24 +29,48 @@ const Header = () => {
 	const methods = useForm<ISearch>();
 	const axiosPrivate = useAxiosPrivate();
 
+	const menuRef = useRef<HTMLDivElement>(null);
+
 	const onSubmit: SubmitHandler<ISearch> = (formData: ISearch) => {
 		if (!formData.searchQuery) return;
 		navigate(`/products?search=${formData.searchQuery}`);
 	};
 
 	const handleLogout = () => {
-		axiosPrivate
-			.post("/logout")
-			.then((res) => {
-				if (!res.data.success) {
-					return toast.error(res.data.message);
-				}
+		const res = axiosPrivate.post("/logout");
+		toast.promise(res, {
+			loading: `Logging out...`,
+			success: (res) => {
 				setUserState(null);
 				localStorage.setItem("isLoggedIn", "false");
 				return toast.success(res.data.message);
-			})
-			.catch(errorHandler);
+			},
+			error: (err) => {
+				if (axios.isAxiosError<{ message: string }>(err)) {
+					if (!err?.response) {
+						return "Something went wrong";
+					} else {
+						return `${err.response?.data?.message}`;
+					}
+				}
+				return "Unexpected error!";
+			},
+		});
 	};
+
+	useEffect(() => {
+		const handler = (e) => {
+			if (!menuRef.current?.contains(e.target)) {
+				setIsMenuOpen(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handler);
+
+		return () => {
+			document.removeEventListener("mousedown", handler);
+		};
+	}, []);
 
 	return (
 		<header className="w-full border-b py-3 sticky top-0 left-0 z-[99] bg-background">
@@ -130,7 +154,10 @@ const Header = () => {
 								<GoPerson className="rounded-[999px]" />
 							)}
 							{isMenuOpen && (
-								<div className="flex flex-col items-start absolute top-[120%] right-0 w-36 bg-white shadow-md rounded-md py-2">
+								<div
+									className="flex flex-col items-start absolute top-[120%] right-0 w-36 bg-white shadow-md rounded-md py-2"
+									ref={menuRef}
+								>
 									<Link
 										to="/myProfile"
 										className="py-2 px-4 hover:bg-secondary w-full text-start"

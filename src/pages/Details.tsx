@@ -232,9 +232,12 @@ const Details = () => {
 										<span>{product.numRating}</span>
 										<TiStar size={16} />
 									</div>
-									<span className="text-mutedForeground cursor-pointer hover:text-secondaryForeground">
+									<a
+										href="#reviews"
+										className="text-mutedForeground cursor-pointer hover:text-secondaryForeground"
+									>
 										({product.reviews.length} Reviews)
-									</span>
+									</a>
 								</div>
 							)}
 							<div className="flex items-center gap-6 mb-6">
@@ -344,7 +347,7 @@ const Details = () => {
 							<Carousel products={similarProducts} />
 						</>
 					)}
-					<div className="border py-4">
+					<div className="border py-4" id="reviews">
 						<div className="flex items-center justify-between p-4 border-b">
 							<span className="text-2xl font-medium">
 								Ratings & Reviews

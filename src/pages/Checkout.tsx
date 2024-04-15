@@ -17,6 +17,10 @@ import { CartItemType } from "./Cart";
 import CartItem from "../components/CartItem";
 import { currencyFormatter } from "../utils/currencyFormat";
 import { Stripe, loadStripe } from "@stripe/stripe-js";
+import { FaArrowLeftLong, FaPlus } from "react-icons/fa6";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { IoIosCheckmarkCircle } from "react-icons/io";
+import { RxCross2 } from "react-icons/rx";
 
 interface IFormInput {
 	name: string;
@@ -56,10 +60,13 @@ const Checkout = () => {
 		useState<IShippingInfo | null>(null);
 	const [states, setStates] = useState<IOption[]>([]);
 	const [isFormOpen, setIsFormOpen] = useState(false);
+	const [isNewFormOpen, setIsNewFormOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [id, setId] = useState<string | undefined>("");
 	const [cart, setCart] = useState<CartItemType[]>([]);
+
+	const [searchParams] = useSearchParams();
 
 	const methods = useForm<IFormInput>({
 		resolver: yupResolver(schema),
@@ -67,6 +74,8 @@ const Checkout = () => {
 			alternatePhone: null,
 		},
 	});
+
+	const navigate = useNavigate();
 
 	const totalAmount = cart
 		.map((item) => item.productId.price * item.quantity)
@@ -177,6 +186,7 @@ const Checkout = () => {
 				});
 				methods.reset();
 				setIsFormOpen(false);
+				setIsNewFormOpen(false);
 				toast.success(res.data.message);
 			})
 			.catch(errorHandler)
@@ -225,6 +235,54 @@ const Checkout = () => {
 		getCartItems();
 	}, [axiosPrivate]);
 
+	if (searchParams.get("status") === "success") {
+		return (
+			<div className="h-full min-h-[80vh] flex items-center justify-center w-full">
+				<div className="w-[28rem] p-8 rounded-md shadow-2xl">
+					<span className="text-2xl font-semibold block mb-3 text-green-600">
+						Thank You! 😊
+					</span>
+					<div className="flex items-center gap-2 text-green-600 text-3xl">
+						<p>Order placed</p>
+						<IoIosCheckmarkCircle />
+					</div>
+					<div
+						className="flex items-center justify-end mt-12"
+						onClick={() => navigate("/myProfile/orders")}
+					>
+						<Button varient="default" size="default">
+							Go to Orders
+						</Button>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	if (searchParams.get("status") === "failed") {
+		return (
+			<div className="h-full min-h-[80vh] flex items-center justify-center w-full">
+				<div className="w-[28rem] p-8 rounded-md shadow-2xl">
+					<span className="text-2xl block font-semibold mb-3 text-red-600">
+						Oh Ohh! 😔
+					</span>
+					<div className="flex items-center gap-2 text-red-600 text-3xl">
+						<p>Payment failed</p>
+						<RxCross2 />
+					</div>
+					<div
+						className="flex items-center justify-end mt-12"
+						onClick={() => navigate("/checkout")}
+					>
+						<Button varient="default" size="default">
+							Try again
+						</Button>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
 	const addresses = (
 		<div className="flex w-full flex-col">
 			{userState?.shippingAddresses.map((address, i) => (
@@ -253,6 +311,34 @@ const Checkout = () => {
 					)}
 				</div>
 			))}
+			<div className="py-6">
+				<div
+					className={`rounded-md p-3  flex items-center gap-4 text-sm ${
+						isNewFormOpen
+							? "text-secondaryForeground"
+							: "border cursor-pointer hover:text-secondaryForeground"
+					}`}
+					onClick={() => setIsNewFormOpen(true)}
+				>
+					{!isNewFormOpen && <FaPlus />}
+					<span className="uppercase">Add a new address</span>
+				</div>
+				{isNewFormOpen && (
+					<AddressForm
+						getStates={getStates}
+						handleCancel={() => {
+							setIsNewFormOpen(false);
+							methods.reset();
+							setIsEditing(false);
+						}}
+						isEditing={isEditing}
+						isLoading={isLoading}
+						methods={methods}
+						onSubmit={onSubmit}
+						states={states}
+					/>
+				)}
+			</div>
 		</div>
 	);
 
@@ -305,6 +391,17 @@ const Checkout = () => {
 
 	const payment = (
 		<div className="w-full flex flex-col">
+			<div className="py-4">
+				<Button
+					varient="outline"
+					size="default"
+					className="gap-2"
+					onClick={() => setStep(2)}
+				>
+					<FaArrowLeftLong />
+					<span>Back</span>
+				</Button>
+			</div>
 			<h2 className="text-lg p-4 border-b uppercase font-semibold text-mutedForeground">
 				Price Details
 			</h2>

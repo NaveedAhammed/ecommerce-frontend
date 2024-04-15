@@ -59,7 +59,7 @@ const Header = () => {
 	};
 
 	useEffect(() => {
-		const handler = (e) => {
+		const handler = (e: any) => {
 			if (!menuRef.current?.contains(e.target)) {
 				setIsMenuOpen(false);
 			}

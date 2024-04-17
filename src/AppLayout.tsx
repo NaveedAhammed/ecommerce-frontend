@@ -8,7 +8,7 @@ const AdminLayout = () => {
 	return (
 		<div className="w-full h-full min-h-[100vh] flex flex-col">
 			<Header />
-			<main className="w-full max-w-[1400px] mx-auto h-full flex-1 relative py-2">
+			<main className="w-full max-w-[1400px] mx-auto h-full flex-1 relative py-2 md:px-4 px-2 xxxlg:px-0">
 				<Suspense
 					fallback={
 						<Loader

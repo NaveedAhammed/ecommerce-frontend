@@ -85,7 +85,15 @@ const Register = () => {
 
 	return (
 		<div className="h-full min-h-[100vh] flex items-center justify-center w-full">
-			<div className="w-[28rem] p-8 rounded-md shadow-2xl">
+			<div className="w-full h-[100vh] ssm:h-fit ssm:w-[28rem] flex flex-col justify-center px-4 ssm:p-8 rounded-md shadow-2xl">
+				<Button
+					varient="link"
+					size="default"
+					className="absolute top-3 right-3 ssm:hidden"
+					onClick={() => navigate("/")}
+				>
+					Back Home
+				</Button>
 				<h1 className="text-3xl font-bold">Register</h1>
 				<p className="mb-8">to continue to Ecommerce Store</p>
 				<FormProvider {...methods}>

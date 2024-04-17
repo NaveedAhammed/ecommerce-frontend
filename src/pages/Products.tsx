@@ -31,6 +31,7 @@ const Products = () => {
 		[]
 	);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isFilteresOpen, setIsFilteresOpen] = useState(false);
 	const navigate = useNavigate();
 	const parentCategoryParam = searchParams.get("parentCategory");
 	const brandsParam = searchParams.get("brands");
@@ -218,8 +219,12 @@ const Products = () => {
 	}, [parentCategoryParam, parentCategories]);
 
 	return (
-		<div className="w-full max-w-[1400px] mx-auto h-full flex gap-10 relative py-2">
-			<div className="w-[20%] border shadow-md rounded-md sticky top-[80px] h-fit left-0 py-2">
+		<div className="w-full max-w-[1400px] mx-auto h-full block ssm:flex gap-2 xxxlg:gap-10 relative py-2">
+			<div
+				className={`sm:w-[35%] xmd:w-[30%] lg:w-[25%] xxlg:w-[20%] ssm:w-[45%] w-[100%] bg-white z-10 absolute top-0 border transition duration-300 shadow-md rounded-md ssm:sticky ssm:top-[80px] h-fit py-2 ${
+					isFilteresOpen ? "left-0" : "-left-[110%]"
+				}`}
+			>
 				<div className="flex flex-col items-center gap-4 w-full p-4 border-b">
 					<div className="w-full flex items-center justify-between">
 						<span className="text-lg">Filters</span>
@@ -601,22 +606,45 @@ const Products = () => {
 						</div>
 					</div>
 				</nav>
+				<div className="w-full flex items-center justify-between px-4 py-6 gap-10 ssm:hidden">
+					<Button
+						varient="outline"
+						size="lg"
+						className="w-full"
+						onClick={() => setIsFilteresOpen(false)}
+					>
+						Cancel
+					</Button>
+					<Button varient="default" size="lg" className="w-full">
+						Apply
+					</Button>
+				</div>
 			</div>
-			<div className="w-[80%] grid grid-cols-5 h-fit gap-y-6 relative">
+			<div className="sm:w-[65%] xmd:w-[70%] lg:w-[75%] xxlg:w-[80%] ssm:w-[55%] w-[100%] grid grid-cols-1 ssm:grid-cols-1 slim:grid-cols-2 xsm:grid-cols-2 xmd:grid-cols-3 mlg:grid-cols-4 xxlg:grid-cols-5 h-fit gap-y-6 relative pt-12 ssm:pt-0 min-h-[100vh]">
 				{isLoading && (
 					<div className="w-full min-h-[80vh] h-full bg-white/70 z-[5] flex items-center justify-center absolute top-0 left-0">
 						<Loader color="black" height="3rem" width="3rem" />
 					</div>
 				)}
+				<div className="w-full absolute top-0 left-0 ssm:hidden">
+					<Button
+						varient="default"
+						size="default"
+						className="rounded-full"
+						onClick={() => setIsFilteresOpen(true)}
+					>
+						Filters
+					</Button>
+				</div>
 				{filteredProducts.length > 0 &&
 					filteredProducts.map((product) => (
 						<ProductItem
 							product={product}
 							key={product._id}
-							className="border-0 shadow-none"
+							className="border-0 shadow-none w-full"
 						/>
 					))}
-				<div className="w-full col-span-5 flex items-center p-4 justify-center gap-3">
+				<div className="w-full col-span-1 xsm:col-span-2 xmd:col-span-3 mlg:col-span-4 xxlg:col-span-5 flex items-center p-4 justify-center gap-3">
 					<Button
 						varient="outline"
 						size="lg"

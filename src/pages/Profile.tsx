@@ -44,7 +44,7 @@ const Profile = () => {
 
 	return (
 		<div className="w-full max-w-[1400px] mx-auto h-full flex gap-10 relative py-2">
-			<div className="w-[20%] border shadow-md rounded-md sticky top-[80px] h-fit left-0 py-2">
+			<div className="w-[50%] xsm:w-[35%] xmd:w-[30%] xxlg:w-[20%] border shadow-md rounded-md sticky top-[80px] h-fit left-0 py-2">
 				<div className="flex items-center gap-4 w-full p-4 border-b">
 					<img
 						src={profilePicture}
@@ -89,7 +89,7 @@ const Profile = () => {
 					/>
 				}
 			>
-				<div className="w-[80%]">
+				<div className="w-[50%] xsm:w-[65%] xmd:w-[70%] xxlg:w-[80%]">
 					<Outlet />
 				</div>
 			</Suspense>

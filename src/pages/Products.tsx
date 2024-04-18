@@ -9,6 +9,7 @@ import { IChildCategory, IParentCategory, IProduct } from "../types";
 import ProductItem from "../components/ProductItem";
 import { errorHandler } from "../utils/errorHandler";
 import Loader from "../components/Loader";
+import { TbAdjustmentsFilled } from "react-icons/tb";
 
 const minDistance = 1000;
 
@@ -219,10 +220,10 @@ const Products = () => {
 	}, [parentCategoryParam, parentCategories]);
 
 	return (
-		<div className="w-full max-w-[1400px] mx-auto h-full block ssm:flex gap-2 xxxlg:gap-10 relative py-2">
+		<div className="w-full max-w-[1400px] mx-auto h-full block ssm:flex gap-2 xxxlg:gap-10 ssm:relative py-2">
 			<div
-				className={`sm:w-[35%] xmd:w-[30%] lg:w-[25%] xxlg:w-[20%] ssm:w-[45%] w-[100%] bg-white z-10 absolute top-0 border transition duration-300 shadow-md rounded-md ssm:sticky ssm:top-[80px] h-fit py-2 ${
-					isFilteresOpen ? "left-0" : "-left-[110%]"
+				className={`sm:w-[35%] xmd:w-[30%] lg:w-[25%] xxlg:w-[20%] ssm:w-[45%] bg-white z-[1000] ssm:z-10 absolute top-0 border transition duration-300 shadow-md rounded-md ssm:sticky h-[100vh] ssm:h-fit left-0 w-[100vw] overflow-y-scroll ssm:overscroll-y-auto bottom-0 ssm:py-2 transform ssm:transform-none ${
+					isFilteresOpen ? "translate-x-0" : "translate-x-[-100%]"
 				}`}
 			>
 				<div className="flex flex-col items-center gap-4 w-full p-4 border-b">
@@ -606,36 +607,35 @@ const Products = () => {
 						</div>
 					</div>
 				</nav>
-				<div className="w-full flex items-center justify-between px-4 py-6 gap-10 ssm:hidden">
+				<div className="w-full flex items-center justify-between px-4 py-6 gap-10 ssm:hidden sticky left-0 right-0 bottom-0 bg-white">
 					<Button
 						varient="outline"
-						size="lg"
+						size="sm"
 						className="w-full"
 						onClick={() => setIsFilteresOpen(false)}
 					>
 						Cancel
 					</Button>
-					<Button varient="default" size="lg" className="w-full">
+					<Button varient="default" size="sm" className="w-full">
 						Apply
 					</Button>
 				</div>
 			</div>
-			<div className="sm:w-[65%] xmd:w-[70%] lg:w-[75%] xxlg:w-[80%] ssm:w-[55%] w-[100%] grid grid-cols-1 ssm:grid-cols-1 slim:grid-cols-2 xsm:grid-cols-2 xmd:grid-cols-3 mlg:grid-cols-4 xxlg:grid-cols-5 h-fit gap-y-6 relative pt-12 ssm:pt-0 min-h-[100vh]">
+			<div className="sm:w-[65%] xmd:w-[70%] lg:w-[75%] xxlg:w-[80%] ssm:w-[55%] w-[100%] grid grid-cols-1 sl:grid-cols-2 ssm:grid-cols-1 slim:grid-cols-2 xsm:grid-cols-2 xmd:grid-cols-3 mlg:grid-cols-4 xxlg:grid-cols-5 h-fit gap-y-6 relative pt-12 ssm:pt-0 min-h-[100vh]">
 				{isLoading && (
 					<div className="w-full min-h-[80vh] h-full bg-white/70 z-[5] flex items-center justify-center absolute top-0 left-0">
 						<Loader color="black" height="3rem" width="3rem" />
 					</div>
 				)}
-				<div className="w-full absolute top-0 left-0 ssm:hidden">
-					<Button
-						varient="default"
-						size="default"
-						className="rounded-full"
-						onClick={() => setIsFilteresOpen(true)}
-					>
-						Filters
-					</Button>
-				</div>
+				<Button
+					varient="default"
+					size="default"
+					className="rounded-[999px!important] gap-2 fixed bottom-3 right-3 z-30 ssm:hidden"
+					onClick={() => setIsFilteresOpen(true)}
+				>
+					<TbAdjustmentsFilled />
+					<span>Filters</span>
+				</Button>
 				{filteredProducts.length > 0 &&
 					filteredProducts.map((product) => (
 						<ProductItem

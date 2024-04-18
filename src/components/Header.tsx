@@ -75,10 +75,10 @@ const Header = () => {
 	return (
 		<header className="w-full border-b py-3 sticky top-0 left-0 z-[99] bg-background md:px-4 px-2">
 			<div className="w-full max-w-[1400px] mx-auto flex items-center justify-between">
-				<nav className="flex items-center gap-4">
+				<nav className="flex items-center gap-1 sl:gap-4">
 					<Link
 						to="/"
-						className="text-2xl font-bold tracking-tight mr-4"
+						className="text-xl sl:text-2xl font-bold tracking-tight sl:mr-4"
 					>
 						Ecommerce Store
 					</Link>
@@ -97,8 +97,8 @@ const Header = () => {
 						</NavLink>
 					</div>
 				</nav>
-				<div className="flex items-center gap-4">
-					<div className="ml-auto lg:w-[35rem]">
+				<div className="flex items-center gap-2 sl:gap-4">
+					<div className="ml-auto xmd:w-[30rem] lg:w-[35rem]">
 						<FormProvider {...methods}>
 							<form
 								className="w-full flex items-center gap-2"
@@ -110,13 +110,13 @@ const Header = () => {
 									autoComplete="on"
 									type="text"
 									placeholder="Search here..."
-									className="hidden lg:block"
+									className="hidden xmd:block"
 								/>
 								<Button
 									size="default"
 									varient="default"
 									type="submit"
-									className="hidden lg:flex"
+									className="hidden xmd:flex"
 								>
 									<IoSearch className="mr-2" />
 									Search
@@ -124,7 +124,7 @@ const Header = () => {
 								<Button
 									varient="secondary"
 									size="icon"
-									className="lg:hidden"
+									className="xmd:hidden"
 								>
 									<IoSearch />
 								</Button>
@@ -177,6 +177,24 @@ const Header = () => {
 									className="flex flex-col items-start absolute top-[120%] right-0 w-36 bg-white shadow-md rounded-md py-2"
 									ref={menuRef}
 								>
+									<Link
+										to="/"
+										className="py-2 px-4 xlg:hidden hover:bg-secondary w-full text-start"
+									>
+										Home
+									</Link>
+									<Link
+										to="/products"
+										className="py-2 px-4 xlg:hidden hover:bg-secondary w-full text-start"
+									>
+										Products
+									</Link>
+									<Link
+										to="/cart"
+										className="py-2 px-4 xlg:hidden hover:bg-secondary w-full text-start"
+									>
+										Cart
+									</Link>
 									<Link
 										to="/myProfile"
 										className="py-2 px-4 hover:bg-secondary w-full text-start"

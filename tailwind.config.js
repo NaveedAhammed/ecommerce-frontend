@@ -4,6 +4,7 @@ export default {
 	theme: {
 		extend: {
 			screens: {
+				sl: "400px",
 				ssm: "530px",
 				xsm: "650px",
 				xmd: "850px",
@@ -11,6 +12,7 @@ export default {
 				xlg: "1180px",
 				xxlg: "1280px",
 				xxxlg: "1350px",
+				es: "1400px",
 			},
 			colors: {
 				background: "hsl(0 0% 100%)",
